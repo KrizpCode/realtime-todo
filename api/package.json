@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
@@ -19,13 +19,16 @@
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@jest/globals": "^29.7.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.1",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
+    "jest": "^29.7.0",
     "prettier": "^3.4.2",
+    "ts-jest": "^29.2.5",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0"
