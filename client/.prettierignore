@@ -5,3 +5,4 @@ tsconfig.json
 tsconfig.app.json
 tsconfig.node.json
 README.md
+routeTree.gen.ts
