@@ -11,7 +11,7 @@ const Header = () => {
       </div>
       <div className="center flex items-center gap-2 pr-4">
         <Link
-          to="/"
+          to="/register"
           className="flex min-h-7 cursor-pointer items-center rounded-sm bg-[#006fff] px-4 text-sm text-white hover:bg-[#338BFF] active:bg-[#0058CC]"
         >
           Register
