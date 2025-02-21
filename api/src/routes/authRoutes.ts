@@ -7,7 +7,7 @@ import {
   register
 } from '../controllers/authController'
 import { validate } from '../middlewares/validate'
-import { loginSchema, registerSchema } from '../schemas/authSchema'
+import { loginSchema, registerSchema } from '../schemas/authSchemas'
 import { authenticateUser } from '../middlewares/authMiddleware'
 
 const router = express.Router()

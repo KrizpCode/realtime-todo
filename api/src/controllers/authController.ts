@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 
-import { LoginDto, RegisterDto } from '../schemas/authSchema'
+import { LoginDto, RegisterDto } from '../schemas/authSchemas'
 import { TypedRequestBody } from '../types/request'
 import {
   createUser,
