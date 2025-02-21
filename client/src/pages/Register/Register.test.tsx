@@ -7,8 +7,6 @@ describe('Register Page', () => {
   it('should render the Register page', () => {
     render(<RegisterPage />)
 
-    screen.debug()
-
     const form = screen.getByRole('form')
 
     expect(within(form).getByLabelText(/name/i)).toBeInTheDocument()

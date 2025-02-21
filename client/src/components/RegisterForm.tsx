@@ -8,8 +8,8 @@ const RegisterUserSchema = z
   .object({
     name: z.string().min(3),
     email: z.string().email(),
-    password: z.string().min(6),
-    confirmPassword: z.string().min(6)
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8)
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -29,9 +29,21 @@ const RegisterForm = () => {
   })
 
   const onSubmit = async (data: RegisterFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
 
-    console.log(data)
+      const result = await response.json()
+
+      console.log(result)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
