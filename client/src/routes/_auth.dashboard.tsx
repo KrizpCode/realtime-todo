@@ -1,12 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useAuth } from '../hooks/useAuth'
+
+import DashboardPage from '../pages/Dashboard'
 
 export const Route = createFileRoute('/_auth/dashboard')({
-  component: RouteComponent
+  component: DashboardPage
 })
-
-function RouteComponent() {
-  const { user } = useAuth()
-
-  return <div>Hello {user?.name}!</div>
-}
