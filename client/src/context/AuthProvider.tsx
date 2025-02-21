@@ -48,6 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await logoutUser()
     } catch (error) {
       console.error('Logout failed', error)
+      // TODO: Display error message to user
     } finally {
       setUser(null)
     }
