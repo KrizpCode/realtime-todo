@@ -1,9 +1,14 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 import { LoginDto, RegisterDto } from '../schemas/authSchema'
 import { TypedRequestBody } from '../types/request'
-import { createUser, getUserByEmail } from '../services/userService'
+import {
+  createUser,
+  getUserByEmail,
+  getUserById
+} from '../services/userService'
 import {
   generateAuthToken,
   generateRefreshToken
@@ -24,13 +29,15 @@ export const register = async (
 
   await createUser(email, password, name)
 
+  // Should register also log the user in?
+
   res.status(201).json({ message: 'User registered successfully' })
 }
 
 export const login = async (req: TypedRequestBody<LoginDto>, res: Response) => {
-  const { email, password } = req.body
+  const { email: loginEmail, password } = req.body
 
-  const user = await getUserByEmail(email)
+  const user = await getUserByEmail(loginEmail)
   const passwordMatch = user && (await bcrypt.compare(password, user.password))
 
   if (!user || !passwordMatch) {
@@ -38,14 +45,57 @@ export const login = async (req: TypedRequestBody<LoginDto>, res: Response) => {
     return
   }
 
-  const authToken = generateAuthToken(user.id)
-  const refreshToken = generateRefreshToken(user.id)
+  const { id: userId, email, name } = user
+
+  const authToken = generateAuthToken(userId)
+  const refreshToken = generateRefreshToken(userId)
+
+  res.cookie('authToken', authToken, {
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: 1000 * 60 * 15
+  })
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     sameSite: 'strict',
-    maxAge: 1000 * 60 * 60 * 24 * 7
+    maxAge: 1000 * 60 * 60 * 24 * 30
   })
 
-  res.status(200).json({ message: 'Login successful', authToken })
+  res
+    .status(200)
+    .json({ message: 'Login successful', user: { userId, email, name } })
+}
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('authToken')
+  res.clearCookie('refreshToken')
+  res.status(200).json({ message: 'Logged out successfully' })
+}
+
+export const getAuthenticatedUser = async (req: Request, res: Response) => {
+  const authToken = req.cookies.authToken
+
+  if (!authToken) {
+    res.status(401).json({ message: 'Unauthorized' })
+    return
+  }
+
+  try {
+    const payload = jwt.verify(authToken, process.env.AUTH_TOKEN_SECRET!) as {
+      userId: number
+    }
+    const user = await getUserById(payload.userId)
+
+    if (!user) {
+      res.status(401).json({ message: 'User not found' })
+      return
+    }
+
+    res
+      .status(200)
+      .json({ user: { userId: user.id, email: user.email, name: user.name } })
+  } catch {
+    res.status(401).json({ message: 'Invalid auth token' })
+  }
 }

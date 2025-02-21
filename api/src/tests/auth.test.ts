@@ -111,12 +111,18 @@ describe('Authentication - Login', () => {
     })
 
     expect(res.status).toBe(200)
-    expect(res.body).toHaveProperty('authToken')
 
     const cookies = res.headers['set-cookie']
 
     expect(cookies).toBeDefined()
     expect(Array.isArray(cookies)).toBe(true)
+
+    const authTokenCookies = (cookies as unknown as string[]).find(
+      (cookie: string) => cookie.startsWith('authToken')
+    )
+
+    expect(authTokenCookies).toBeDefined()
+    expect(authTokenCookies).toContain('HttpOnly')
 
     const refreshTokenCookie = (cookies as unknown as string[]).find(
       (cookie: string) => cookie.startsWith('refreshToken')
