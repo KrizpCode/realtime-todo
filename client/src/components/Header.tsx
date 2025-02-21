@@ -17,7 +17,7 @@ const Header = () => {
           Register
         </Link>
         <Link
-          to="/"
+          to="/login"
           className="flex min-h-7 cursor-pointer items-center rounded-sm px-4 text-sm text-[#676f79] hover:bg-[#2123270A]"
         >
           Login

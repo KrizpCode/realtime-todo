@@ -1,8 +1,14 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-import Header from '../components/Header'
 
-export const Route = createRootRoute({
+import Header from '../components/Header'
+import { AuthContextType } from '../context/AuthContext'
+
+interface RouterContext {
+  auth?: AuthContextType
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => (
     <div className="h-full min-h-screen">
       <Header />
