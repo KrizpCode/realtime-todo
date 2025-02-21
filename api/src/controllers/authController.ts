@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 
 import { LoginDto, RegisterDto } from '../schemas/authSchema'
 import { TypedRequestBody } from '../types/request'
@@ -74,28 +73,21 @@ export const logout = async (req: Request, res: Response) => {
 }
 
 export const getAuthenticatedUser = async (req: Request, res: Response) => {
-  const authToken = req.cookies.authToken
+  const userId = req.userId
 
-  if (!authToken) {
+  if (!userId) {
     res.status(401).json({ message: 'Unauthorized' })
     return
   }
 
-  try {
-    const payload = jwt.verify(authToken, process.env.AUTH_TOKEN_SECRET!) as {
-      userId: number
-    }
-    const user = await getUserById(payload.userId)
+  const user = await getUserById(userId)
 
-    if (!user) {
-      res.status(401).json({ message: 'User not found' })
-      return
-    }
-
-    res
-      .status(200)
-      .json({ user: { userId: user.id, email: user.email, name: user.name } })
-  } catch {
-    res.status(401).json({ message: 'Invalid auth token' })
+  if (!user) {
+    res.status(401).json({ message: 'User not found' })
+    return
   }
+
+  res
+    .status(200)
+    .json({ user: { userId: user.id, email: user.email, name: user.name } })
 }

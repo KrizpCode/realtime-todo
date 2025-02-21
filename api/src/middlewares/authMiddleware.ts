@@ -15,7 +15,11 @@ export const authenticateUser = async (
   }
 
   try {
-    jwt.verify(authToken, process.env.AUTH_TOKEN_SECRET!)
+    const payload = jwt.verify(authToken, process.env.AUTH_TOKEN_SECRET!) as {
+      userId: number
+    }
+
+    req.userId = payload.userId
     next()
   } catch {
     const refreshToken = req.cookies.refreshToken
@@ -41,6 +45,7 @@ export const authenticateUser = async (
         maxAge: 1000 * 60 * 15
       })
 
+      req.userId = payload.userId
       next()
     } catch {
       res.status(401).json({ message: 'Invalid refresh token' })
