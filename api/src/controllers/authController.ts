@@ -17,20 +17,43 @@ export const register = async (
   req: TypedRequestBody<RegisterDto>,
   res: Response
 ) => {
-  const { email, password, name } = req.body
+  const { email: registerEmail, password, name: registerName } = req.body
 
-  const existingUser = await getUserByEmail(email)
+  const existingUser = await getUserByEmail(registerEmail)
 
   if (existingUser) {
     res.status(400).json({ message: 'Email already in use' })
     return
   }
 
-  await createUser(email, password, name)
+  const newUser = await createUser(registerEmail, password, registerName)
 
-  // Should register also log the user in?
+  if (!newUser) {
+    res.status(500).json({ message: 'Failed to register user' })
+    return
+  }
 
-  res.status(201).json({ message: 'User registered successfully' })
+  const { id: userId, email, name } = newUser
+
+  const authToken = generateAuthToken(userId)
+  const refreshToken = generateRefreshToken(userId)
+
+  res.cookie('authToken', authToken, {
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: 1000 * 60 * 15
+  })
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: 1000 * 60 * 60 * 24 * 30
+  })
+
+  res.status(201).json({
+    message: 'User registered successfully',
+    user: { userId, email, name }
+  })
 }
 
 export const login = async (req: TypedRequestBody<LoginDto>, res: Response) => {
