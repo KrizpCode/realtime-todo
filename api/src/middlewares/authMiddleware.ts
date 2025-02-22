@@ -10,18 +10,6 @@ export const authenticateUser = async (
   const authToken = req.cookies.authToken
 
   if (!authToken) {
-    res.status(401).json({ message: 'Unauthorized' })
-    return
-  }
-
-  try {
-    const payload = jwt.verify(authToken, process.env.AUTH_TOKEN_SECRET!) as {
-      userId: number
-    }
-
-    req.userId = payload.userId
-    next()
-  } catch {
     const refreshToken = req.cookies.refreshToken
 
     if (!refreshToken) {
@@ -33,9 +21,7 @@ export const authenticateUser = async (
       const payload = jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET!
-      ) as {
-        userId: number
-      }
+      ) as { userId: number }
 
       const newAuthToken = generateAuthToken(payload.userId)
 
@@ -46,9 +32,22 @@ export const authenticateUser = async (
       })
 
       req.userId = payload.userId
-      next()
+      return next()
     } catch {
       res.status(401).json({ message: 'Invalid refresh token' })
+      return
     }
+  }
+
+  try {
+    const payload = jwt.verify(authToken, process.env.AUTH_TOKEN_SECRET!) as {
+      userId: number
+    }
+
+    req.userId = payload.userId
+    return next()
+  } catch {
+    res.status(401).json({ message: 'Invalid auth token' })
+    return
   }
 }
