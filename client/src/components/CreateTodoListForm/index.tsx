@@ -1,15 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import FormField from './FormField'
 
-const createTodoListSchema = z.object({
-  name: z.string().nonempty('Name is required')
-})
+import { useCreateTaskList } from '../../hooks/useTodoLists'
+import FormField from '../FormField'
+import { createTodoListSchema, TodoListFormData } from './schema'
 
-type TodoListFormData = z.infer<typeof createTodoListSchema>
+const CreateTodoListForm = () => {
+  const { mutate } = useCreateTaskList()
 
-const TodoListForm = () => {
   const {
     register,
     handleSubmit,
@@ -21,24 +19,8 @@ const TodoListForm = () => {
   })
 
   const onSubmit = async (data: TodoListFormData) => {
-    try {
-      const response = await fetch('/api/todo-lists', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        credentials: 'include'
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to create todo list')
-      }
-
-      reset()
-    } catch (error) {
-      console.error(error)
-    }
+    mutate(data)
+    reset()
   }
 
   return (
@@ -60,4 +42,4 @@ const TodoListForm = () => {
   )
 }
 
-export default TodoListForm
+export default CreateTodoListForm

@@ -1,28 +1,16 @@
-import { useEffect, useState } from 'react'
-import TodoListForm from '../../components/TodoListForm'
-
-interface TodoList {
-  uuid: string
-  name: string
-}
+import CreateTodoListForm from '../../components/CreateTodoListForm'
+import { useTodoLists } from '../../hooks/useTodoLists'
 
 const DashboardPage = () => {
-  const [todoLists, setTodoLists] = useState<TodoList[]>([])
+  const { data: todoLists, isSuccess } = useTodoLists()
 
-  useEffect(() => {
-    const fetchTodoLists = async () => {
-      const response = await fetch('/api/todo-lists')
-      const result = await response.json()
-
-      setTodoLists(result)
-    }
-
-    fetchTodoLists()
-  }, [])
+  if (!isSuccess) {
+    return <div>Loading...</div>
+  }
 
   return (
     <main className="p-4">
-      <TodoListForm />
+      <CreateTodoListForm />
       {todoLists.map((todoList) => (
         <div
           key={todoList.uuid}

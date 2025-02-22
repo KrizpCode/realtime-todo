@@ -1,22 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
-import FormField from './FormField'
-
-const RegisterUserSchema = z
-  .object({
-    name: z.string().min(3),
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8)
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword']
-  })
-
-type RegisterFormData = z.infer<typeof RegisterUserSchema>
+import { RegisterFormData, RegisterUserSchema } from './schema'
+import FormField from '../FormField'
 
 const RegisterForm = () => {
   const {

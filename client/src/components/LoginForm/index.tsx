@@ -1,16 +1,10 @@
-import { z } from 'zod'
-import FormField from './FormField'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAuth } from '../hooks/useAuth'
 import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
 
-const LoginUserSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8)
-})
-
-type LoginFormData = z.infer<typeof LoginUserSchema>
+import { useAuth } from '../../hooks/useAuth'
+import FormField from '../FormField'
+import { LoginFormData, LoginUserSchema } from './schema'
 
 const LoginForm = () => {
   const auth = useAuth()
