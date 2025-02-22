@@ -15,37 +15,44 @@ import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as IndexImport } from './routes/index'
-import { Route as AuthDashboardImport } from './routes/_auth.dashboard'
+import { Route as AuthDashboardImport } from './routes/_auth/dashboard'
+import { Route as AuthTodoListsTodoListUUIDImport } from './routes/_auth/todo-lists/$todoListUUID'
 
 // Create/Update Routes
 
 const RegisterRoute = RegisterImport.update({
   id: '/register',
   path: '/register',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRoute
 } as any)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRoute
 } as any)
 
 const AuthRoute = AuthImport.update({
   id: '/_auth',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRoute
 } as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRoute
 } as any)
 
 const AuthDashboardRoute = AuthDashboardImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AuthRoute,
+  getParentRoute: () => AuthRoute
+} as any)
+
+const AuthTodoListsTodoListUUIDRoute = AuthTodoListsTodoListUUIDImport.update({
+  id: '/todo-lists/$todoListUUID',
+  path: '/todo-lists/$todoListUUID',
+  getParentRoute: () => AuthRoute
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -87,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/todo-lists/$todoListUUID': {
+      id: '/_auth/todo-lists/$todoListUUID'
+      path: '/todo-lists/$todoListUUID'
+      fullPath: '/todo-lists/$todoListUUID'
+      preLoaderRoute: typeof AuthTodoListsTodoListUUIDImport
+      parentRoute: typeof AuthImport
+    }
   }
 }
 
@@ -94,10 +108,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthTodoListsTodoListUUIDRoute: typeof AuthTodoListsTodoListUUIDRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthDashboardRoute: AuthDashboardRoute,
+  AuthTodoListsTodoListUUIDRoute: AuthTodoListsTodoListUUIDRoute
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -108,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/todo-lists/$todoListUUID': typeof AuthTodoListsTodoListUUIDRoute
 }
 
 export interface FileRoutesByTo {
@@ -116,6 +133,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/todo-lists/$todoListUUID': typeof AuthTodoListsTodoListUUIDRoute
 }
 
 export interface FileRoutesById {
@@ -125,14 +143,34 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/todo-lists/$todoListUUID': typeof AuthTodoListsTodoListUUIDRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/login' | '/register' | '/dashboard'
+  fullPaths:
+    | '/'
+    | ''
+    | '/login'
+    | '/register'
+    | '/dashboard'
+    | '/todo-lists/$todoListUUID'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/login' | '/register' | '/dashboard'
-  id: '__root__' | '/' | '/_auth' | '/login' | '/register' | '/_auth/dashboard'
+  to:
+    | '/'
+    | ''
+    | '/login'
+    | '/register'
+    | '/dashboard'
+    | '/todo-lists/$todoListUUID'
+  id:
+    | '__root__'
+    | '/'
+    | '/_auth'
+    | '/login'
+    | '/register'
+    | '/_auth/dashboard'
+    | '/_auth/todo-lists/$todoListUUID'
   fileRoutesById: FileRoutesById
 }
 
@@ -147,7 +185,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
-  RegisterRoute: RegisterRoute,
+  RegisterRoute: RegisterRoute
 }
 
 export const routeTree = rootRoute
@@ -172,7 +210,8 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
-        "/_auth/dashboard"
+        "/_auth/dashboard",
+        "/_auth/todo-lists/$todoListUUID"
       ]
     },
     "/login": {
@@ -182,7 +221,11 @@ export const routeTree = rootRoute
       "filePath": "register.tsx"
     },
     "/_auth/dashboard": {
-      "filePath": "_auth.dashboard.tsx",
+      "filePath": "_auth/dashboard.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/todo-lists/$todoListUUID": {
+      "filePath": "_auth/todo-lists/$todoListUUID.tsx",
       "parent": "/_auth"
     }
   }

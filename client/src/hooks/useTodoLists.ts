@@ -1,7 +1,26 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query'
 
-import { createTodoList, fetchTodoLists } from '../services/todoListService'
+import {
+  createTodoList,
+  fetchTodoList,
+  fetchTodoLists
+} from '../services/todoListService'
 import { TodoListFormData } from '../components/CreateTodoListForm/schema'
+
+export const todoListQueryOptions = (todoListUUID: string) =>
+  queryOptions({
+    queryKey: ['todoLists', todoListUUID],
+    queryFn: async () => fetchTodoList(todoListUUID)
+  })
+
+export const useTodoList = (todoListUUID: string) => {
+  return useQuery(todoListQueryOptions(todoListUUID))
+}
 
 export const useTodoLists = () => {
   return useQuery({
