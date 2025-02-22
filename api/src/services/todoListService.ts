@@ -12,3 +12,11 @@ export const createTodoList = async (
     }
   })
 }
+
+export const getTodoListsByUserId = async (userId: User['id']) => {
+  return await prisma.todoList.findMany({
+    where: {
+      ownerId: userId
+    }
+  })
+}
