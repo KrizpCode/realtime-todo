@@ -1,11 +1,14 @@
 import { createContext } from 'react'
 
-import { User } from './AuthProvider'
+import { LoginFormData } from '../components/LoginForm/schema'
+import { RegisterFormData } from '../components/RegisterForm/schema'
+import { User } from '../types/user'
 
 export interface AuthContextType {
   isAuthenticated: boolean
   user: User | null
-  login: (email: string, password: string) => Promise<void>
+  login: (data: LoginFormData) => Promise<void>
+  register: (data: RegisterFormData) => Promise<void>
   logout: () => Promise<void>
 }
 

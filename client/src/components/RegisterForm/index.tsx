@@ -1,10 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { useNavigate, useRouter } from '@tanstack/react-router'
 
 import { RegisterFormData, RegisterUserSchema } from './schema'
 import FormField from '../FormField'
+import { useAuth } from '../../hooks/useAuth'
 
 const RegisterForm = () => {
+  const auth = useAuth()
+  const router = useRouter()
+  const navigate = useNavigate()
+
   const {
     register,
     handleSubmit,
@@ -16,17 +22,11 @@ const RegisterForm = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
+      await auth.register(data)
 
-      const result = await response.json()
+      await router.invalidate()
 
-      console.log(result)
+      await navigate({ to: '/dashboard' })
     } catch (error) {
       console.error(error)
     }

@@ -23,7 +23,7 @@ const LoginForm = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await auth.login(data.email, data.password)
+      await auth.login(data)
 
       await router.invalidate()
 

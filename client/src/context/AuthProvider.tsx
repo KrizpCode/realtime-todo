@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { AuthContext } from './AuthContext'
-import { fetchUser, loginUser, logoutUser } from '../services/authService'
+import {
+  fetchUser,
+  loginUser,
+  logoutUser,
+  registerUser
+} from '../services/authService'
+import { User } from '../types/user'
+import { LoginFormData } from '../components/LoginForm/schema'
+import { RegisterFormData } from '../components/RegisterForm/schema'
 
 interface AuthProviderProps {
   children: React.ReactNode
-}
-
-export interface User {
-  userId: number
-  email: string
-  name: string
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -32,9 +34,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     fetchUserData()
   }, [])
 
-  const login = useCallback(async (email: string, password: string) => {
+  const register = useCallback(async (data: RegisterFormData) => {
     try {
-      const userData = await loginUser(email, password)
+      const userData = await registerUser(data)
+
+      setUser(userData)
+    } catch (error) {
+      console.error(error)
+      // TODO: Display error message to user
+    }
+  }, [])
+
+  const login = useCallback(async (data: LoginFormData) => {
+    try {
+      const userData = await loginUser(data)
 
       setUser(userData)
     } catch (error) {
@@ -55,7 +68,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, register, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )
