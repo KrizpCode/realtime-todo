@@ -1,39 +1,29 @@
-import { User } from '../context/AuthProvider'
+import { LoginFormData } from '../components/LoginForm/schema'
+import { RegisterFormData } from '../components/RegisterForm/schema'
+import { User } from '../types/user'
+import { apiClient } from './apiClient'
 
-export const loginUser = async (email: string, password: string) => {
-  const response = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-    credentials: 'include'
-  })
+export const registerUser = async (data: RegisterFormData) => {
+  const response = await apiClient.post<{ user: User }>(
+    '/api/auth/register',
+    data
+  )
 
-  const result = await response.json()
+  return response.user
+}
 
-  if (!response.ok) {
-    throw new Error(result.message || 'Login failed')
-  }
+export const loginUser = async (data: LoginFormData) => {
+  const response = await apiClient.post<{ user: User }>('/api/auth/login', data)
 
-  return result.user as User
+  return response.user
 }
 
 export const logoutUser = async () => {
-  await fetch('/api/auth/logout', {
-    method: 'POST',
-    credentials: 'include'
-  })
+  await apiClient.post('/api/auth/logout')
 }
 
 export const fetchUser = async () => {
-  const response = await fetch('/api/auth/me', {
-    credentials: 'include'
-  })
+  const response = await apiClient.get<{ user: User }>('/api/auth/me')
 
-  const result = await response.json()
-
-  if (!response.ok) {
-    throw new Error(result.message || 'Failed to fetch user')
-  }
-
-  return result.user as User
+  return response.user
 }
