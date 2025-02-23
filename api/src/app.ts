@@ -10,9 +10,10 @@ const app = express()
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      callback(null, origin)
-    },
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? 'https://johan-realtime-todo.vercel.app'
+        : ['http://localhost:3000'],
     credentials: true
   })
 )

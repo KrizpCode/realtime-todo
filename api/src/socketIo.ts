@@ -6,7 +6,10 @@ let io: SocketServer
 export const initializeSocketIo = (server: HttpServer) => {
   io = new SocketServer(server, {
     cors: {
-      origin: '*',
+      origin:
+        process.env.NODE_ENV === 'production'
+          ? 'https://johan-realtime-todo.vercel.app'
+          : ['http://localhost:3000'],
       credentials: true
     }
   })
