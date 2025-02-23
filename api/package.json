@@ -7,14 +7,15 @@
   "scripts": {
     "test": "jest",
     "dev": "tsx watch src/server.ts",
-    "build": "prisma:generate && tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "prettier:check": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
