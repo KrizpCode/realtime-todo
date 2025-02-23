@@ -1,6 +1,6 @@
 import { Request } from 'express'
 
-export type TypedRequestBody<T> = Request<object, object, T>
+export type TypedRequest<T, U = object> = Request<U, object, T>
 
 declare module 'express' {
   interface Request {

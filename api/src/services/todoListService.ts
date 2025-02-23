@@ -28,7 +28,11 @@ export const getTodoListByUUID = async (uuid: TodoList['uuid']) => {
       uuid
     },
     include: {
-      todos: true
+      todos: {
+        orderBy: {
+          id: 'asc'
+        }
+      }
     }
   })
 }

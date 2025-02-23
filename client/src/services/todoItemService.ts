@@ -6,3 +6,8 @@ export const createTodoItem = (
   listId: TodoList['id'],
   text: TodoItem['text']
 ) => apiClient.post<TodoItem>('/api/todo-items', { listId, text })
+
+export const updateTodoItem = (
+  todoItemId: TodoItem['id'],
+  completed: TodoItem['completed']
+) => apiClient.put<TodoItem>(`/api/todo-items/${todoItemId}`, { completed })

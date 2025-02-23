@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 
-import { TypedRequestBody } from '../types/request'
+import { TypedRequest } from '../types/request'
 import { CreateTodoListDto } from '../schemas/todoListSchemas'
 import {
   createTodoList,
@@ -9,7 +9,7 @@ import {
 } from '../services/todoListService'
 
 export const createTodoListHandler = async (
-  req: TypedRequestBody<CreateTodoListDto>,
+  req: TypedRequest<CreateTodoListDto>,
   res: Response
 ) => {
   try {

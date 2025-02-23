@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 
 import { LoginDto, RegisterDto } from '../schemas/authSchemas'
-import { TypedRequestBody } from '../types/request'
+import { TypedRequest } from '../types/request'
 import {
   createUser,
   getUserByEmail,
@@ -14,7 +14,7 @@ import {
 } from '../helpers/tokenHelpers'
 
 export const register = async (
-  req: TypedRequestBody<RegisterDto>,
+  req: TypedRequest<RegisterDto>,
   res: Response
 ) => {
   const { email: registerEmail, password, name: registerName } = req.body
@@ -56,7 +56,7 @@ export const register = async (
   })
 }
 
-export const login = async (req: TypedRequestBody<LoginDto>, res: Response) => {
+export const login = async (req: TypedRequest<LoginDto>, res: Response) => {
   const { email: loginEmail, password } = req.body
 
   const user = await getUserByEmail(loginEmail)

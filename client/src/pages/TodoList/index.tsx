@@ -2,6 +2,7 @@ import { useParams } from '@tanstack/react-router'
 
 import { useTodoList } from '../../hooks/useTodoLists'
 import CreateTodoItemForm from '../../components/CreateTodoItemForm'
+import TodoItemCard from '../../components/TodoItemCard'
 
 const TodoListPage = () => {
   const params = useParams({ from: '/_auth/todo-lists/$todoListUUID' })
@@ -18,13 +19,21 @@ const TodoListPage = () => {
   const { id: listId, name, todos } = data
 
   return (
-    <div>
-      <h1>{name}</h1>
+    <main className="p-4">
+      <h1 className="text-2xl font-bold">{name}</h1>
       <CreateTodoItemForm listId={listId} />
-      {todos.map((todo) => {
-        return <div key={todo.id}>{todo.text}</div>
-      })}
-    </div>
+      <div className="mt-6 flex flex-col gap-2">
+        {todos.map((todo) => {
+          return (
+            <TodoItemCard
+              key={todo.id}
+              todo={todo}
+              todoListUUID={params.todoListUUID}
+            />
+          )
+        })}
+      </div>
+    </main>
   )
 }
 

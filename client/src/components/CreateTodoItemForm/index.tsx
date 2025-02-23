@@ -5,7 +5,7 @@ import { useParams } from '@tanstack/react-router'
 import { TodoList } from '../../types/todoList'
 import { CreateTodoItemFormData, createTodoItemSchema } from './schema'
 import FormField from '../FormField'
-import { useCreateTaskItem } from '../../hooks/useTodoItems'
+import { useCreateTodoItem } from '../../hooks/useTodoItems'
 
 interface CreateTodoItemFormProps {
   listId: TodoList['id']
@@ -13,7 +13,7 @@ interface CreateTodoItemFormProps {
 
 const CreateTodoItemForm = ({ listId }: CreateTodoItemFormProps) => {
   const params = useParams({ from: '/_auth/todo-lists/$todoListUUID' })
-  const { mutate } = useCreateTaskItem(params.todoListUUID)
+  const { mutate } = useCreateTodoItem(params.todoListUUID)
 
   const {
     register,
