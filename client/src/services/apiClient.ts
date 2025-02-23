@@ -1,6 +1,11 @@
-const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const VITE_API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000'
+).replace(/\/$/, '')
 
-const getUrl = (urlPath: string) => `${VITE_API_BASE_URL}${urlPath}`
+const getUrl = (urlPath: string) => {
+  const normalizedPath = urlPath.startsWith('/') ? urlPath : `/${urlPath}`
+  return `${VITE_API_BASE_URL}${normalizedPath}`
+}
 
 export const apiClient = {
   get: async <T>(urlPath: string): Promise<T> => {
