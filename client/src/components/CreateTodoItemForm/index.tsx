@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from '@tanstack/react-router'
 
 import { TodoList } from '../../types/todoList'
 import { CreateTodoItemFormData, createTodoItemSchema } from './schema'
@@ -11,7 +12,8 @@ interface CreateTodoItemFormProps {
 }
 
 const CreateTodoItemForm = ({ listId }: CreateTodoItemFormProps) => {
-  const { mutate } = useCreateTaskItem()
+  const params = useParams({ from: '/_auth/todo-lists/$todoListUUID' })
+  const { mutate } = useCreateTaskItem(params.todoListUUID)
 
   const {
     register,

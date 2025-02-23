@@ -14,7 +14,7 @@ import { CreateTodoListFormData } from '../components/CreateTodoListForm/schema'
 
 export const todoListQueryOptions = (todoListUUID: string) =>
   queryOptions({
-    queryKey: ['todoLists', todoListUUID],
+    queryKey: ['todoList', todoListUUID],
     queryFn: async () => fetchTodoList(todoListUUID)
   })
 
