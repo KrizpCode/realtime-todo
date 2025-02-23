@@ -11,5 +11,8 @@ export default [
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  eslintPluginPrettierRecommended
+  eslintPluginPrettierRecommended,
+  {
+    ignores: ['**/dist']
+  }
 ]
