@@ -36,6 +36,10 @@ const TodoListPage = () => {
     )
 
     return () => {
+      socketClient.off('todoItemCreated', handleTodoItemEvent)
+      socketClient.off('todoItemUpdated', handleTodoItemEvent)
+      socketClient.off('todoItemDeleted', handleTodoItemEvent)
+
       socketClient.disconnect()
       console.log('Disconnected from socket.io')
     }
