@@ -24,12 +24,20 @@ const Header = () => {
       </div>
       <div className="center flex items-center gap-2 pr-4">
         {user ? (
-          <button
-            onClick={handleLogout}
-            className="flex min-h-7 cursor-pointer items-center rounded-sm px-4 text-sm text-[#676f79] hover:bg-[#2123270A]"
-          >
-            Logout
-          </button>
+          <>
+            <Link
+              to="/dashboard"
+              className="flex min-h-7 cursor-pointer items-center rounded-sm bg-[#006fff] px-4 text-sm text-white hover:bg-[#338BFF] active:bg-[#0058CC]"
+            >
+              Dashboard
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex min-h-7 cursor-pointer items-center rounded-sm px-4 text-sm text-[#676f79] hover:bg-[#2123270A]"
+            >
+              Logout
+            </button>
+          </>
         ) : (
           <>
             <Link
