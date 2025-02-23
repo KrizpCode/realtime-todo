@@ -25,6 +25,9 @@ export const getTodoListByUUID = async (uuid: TodoList['uuid']) => {
   return await prisma.todoList.findUnique({
     where: {
       uuid
+    },
+    include: {
+      todos: true
     }
   })
 }

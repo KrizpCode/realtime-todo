@@ -1,5 +1,6 @@
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { type QueryClient } from '@tanstack/react-query'
 
 import Header from '../components/Header'
@@ -17,6 +18,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       <div className="h-full pt-12">
         <Outlet />
         <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
+        <ReactQueryDevtools
+          buttonPosition="bottom-left"
+          initialIsOpen={false}
+        />
       </div>
     </div>
   )
