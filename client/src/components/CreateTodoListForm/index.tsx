@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 
 import { useCreateTaskList } from '../../hooks/useTodoLists'
 import FormField from '../FormField'
-import { createTodoListSchema, TodoListFormData } from './schema'
+import { CreateTodoListFormData, createTodoListSchema } from './schema'
 
 const CreateTodoListForm = () => {
   const { mutate } = useCreateTaskList()
@@ -13,12 +13,12 @@ const CreateTodoListForm = () => {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting }
-  } = useForm<TodoListFormData>({
+  } = useForm<CreateTodoListFormData>({
     resolver: zodResolver(createTodoListSchema),
     mode: 'all'
   })
 
-  const onSubmit = async (data: TodoListFormData) => {
+  const onSubmit = async (data: CreateTodoListFormData) => {
     mutate(data)
     reset()
   }

@@ -10,7 +10,7 @@ import {
   fetchTodoList,
   fetchTodoLists
 } from '../services/todoListService'
-import { TodoListFormData } from '../components/CreateTodoListForm/schema'
+import { CreateTodoListFormData } from '../components/CreateTodoListForm/schema'
 
 export const todoListQueryOptions = (todoListUUID: string) =>
   queryOptions({
@@ -33,7 +33,7 @@ export const useCreateTaskList = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: TodoListFormData) => createTodoList(data.name),
+    mutationFn: (data: CreateTodoListFormData) => createTodoList(data.name),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['todoLists'] })
   })
 }

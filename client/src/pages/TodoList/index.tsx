@@ -1,6 +1,7 @@
 import { useParams } from '@tanstack/react-router'
 
 import { useTodoList } from '../../hooks/useTodoLists'
+import CreateTodoItemForm from '../../components/CreateTodoItemForm'
 
 const TodoListPage = () => {
   const params = useParams({ from: '/_auth/todo-lists/$todoListUUID' })
@@ -14,13 +15,14 @@ const TodoListPage = () => {
     return <div>Todo list not found</div>
   }
 
-  const { name, todos } = data
+  const { id: listId, name, todos } = data
 
   return (
     <div>
       <h1>{name}</h1>
+      <CreateTodoItemForm listId={listId} />
       {todos.map((todo) => {
-        return <div key={todo.id}>{todo.id}</div>
+        return <div key={todo.id}>{todo.text}</div>
       })}
     </div>
   )

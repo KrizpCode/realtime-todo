@@ -1,3 +1,4 @@
-export type Todoitem = {
+export type TodoItem = {
   id: number
+  text: string
 }

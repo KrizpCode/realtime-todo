@@ -1,11 +1,11 @@
-import { Todoitem } from './todoItem'
+import { TodoItem } from './todoItem'
 
 export type TodoList = {
   id: number
   uuid: string
   name: string
   ownerId: number
-  todos: Todoitem[]
+  todos: TodoItem[]
   createdAt: string
   updatedAt: string
 }
