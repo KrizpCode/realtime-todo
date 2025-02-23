@@ -1,11 +1,19 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 
 import authRoutes from './routes/authRoutes'
 import todoListRoutes from './routes/todoListRoutes'
 import todoItemRoutes from './routes/todoItemRoutes'
 
 const app = express()
+
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'https://johan-realtime-todo.vercel.app'],
+    credentials: true
+  })
+)
 
 app.use(express.json())
 app.use(cookieParser())
