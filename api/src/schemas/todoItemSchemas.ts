@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const createTodoItemSchema = z.object({
-  name: z.string().nonempty('Name is required'),
+  text: z.string().nonempty('Name is required'),
   listId: z.number().positive()
 })
 

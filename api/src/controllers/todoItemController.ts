@@ -9,9 +9,9 @@ export const createTodoItemHandler = async (
   res: Response
 ) => {
   try {
-    const { name, listId } = req.body
+    const { text, listId } = req.body
 
-    await createTodoitem(listId, name)
+    await createTodoitem(listId, text)
 
     res.status(201).json({ message: 'Todo item created successfully' })
   } catch {
