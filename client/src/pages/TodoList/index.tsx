@@ -10,7 +10,7 @@ const TodoListPage = () => {
   const { todoListUUID } = useParams({
     from: '/_auth/todo-lists/$todoListUUID'
   })
-  const { data, isLoading } = useTodoList(todoListUUID)
+  const { data, isLoading, refetch } = useTodoList(todoListUUID)
 
   useEffect(() => {
     socketClient.connect()
@@ -18,11 +18,16 @@ const TodoListPage = () => {
 
     socketClient.emit('joinTodoList', todoListUUID)
 
+    socketClient.on('todoItemUpdated', () => {
+      console.log('Received todoItemUpdated event')
+      refetch()
+    })
+
     return () => {
       socketClient.disconnect()
       console.log('Disconnected from socket.io')
     }
-  }, [todoListUUID])
+  }, [todoListUUID, refetch])
 
   if (isLoading) {
     return <div>Loading...</div>

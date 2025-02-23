@@ -1,8 +1,10 @@
 import { Server as HttpServer } from 'http'
 import { Server as SocketServer } from 'socket.io'
 
+let io: SocketServer
+
 export const initializeSocketIo = (server: HttpServer) => {
-  const io = new SocketServer(server, {
+  io = new SocketServer(server, {
     cors: {
       origin: 'http://localhost:3000',
       credentials: true
@@ -24,3 +26,5 @@ export const initializeSocketIo = (server: HttpServer) => {
 
   return io
 }
+
+export const getSocketIo = () => io

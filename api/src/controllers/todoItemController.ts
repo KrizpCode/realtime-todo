@@ -7,6 +7,8 @@ import {
   updateTodoItem
 } from '../services/todoItemService'
 import { TypedRequest } from '../types/request'
+import { getSocketIo } from '../socketIo'
+import { getTodoListById } from '../services/todoListService'
 
 export const createTodoItemHandler = async (
   req: TypedRequest<CreateTodoItemSchema>,
@@ -31,7 +33,24 @@ export const updateTodoItemHandler = async (
     const { completed } = req.body
     const { todoItemId } = req.params
 
-    await updateTodoItem(Number(todoItemId), completed)
+    const updatedTodoItem = await updateTodoItem(Number(todoItemId), completed)
+
+    if (!updatedTodoItem) {
+      res.status(404).json({ message: 'Todo item not found' })
+      return
+    }
+
+    const todoList = await getTodoListById(updatedTodoItem.listId)
+
+    if (!todoList) {
+      res.status(404).json({ message: 'Todo list not found' })
+      return
+    }
+
+    console.log('Emitting todoItemUpdated event', todoList.uuid)
+
+    const io = getSocketIo()
+    io.to(todoList.uuid).emit('todoItemUpdated')
 
     res.status(200).json({ message: 'Todo item updated successfully' })
   } catch {

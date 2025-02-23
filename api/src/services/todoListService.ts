@@ -36,3 +36,11 @@ export const getTodoListByUUID = async (uuid: TodoList['uuid']) => {
     }
   })
 }
+
+export const getTodoListById = async (id: TodoList['id']) => {
+  return await prisma.todoList.findUnique({
+    where: {
+      id
+    }
+  })
+}
