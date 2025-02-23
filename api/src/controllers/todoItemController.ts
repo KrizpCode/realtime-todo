@@ -17,7 +17,22 @@ export const createTodoItemHandler = async (
   try {
     const { text, listId } = req.body
 
-    await createTodoitem(listId, text)
+    const createdTodoItem = await createTodoitem(listId, text)
+
+    if (!createdTodoItem) {
+      res.status(404).json({ message: 'Todo list not found' })
+      return
+    }
+
+    const todoList = await getTodoListById(listId)
+
+    if (!todoList) {
+      res.status(404).json({ message: 'Todo list not found' })
+      return
+    }
+
+    const io = getSocketIo()
+    io.to(todoList.uuid).emit('todoItemCreated', createdTodoItem)
 
     res.status(201).json({ message: 'Todo item created successfully' })
   } catch {
@@ -60,7 +75,22 @@ export const deleteTodoItemHandler = async (req: Request, res: Response) => {
   try {
     const { todoItemId } = req.params
 
-    await deleteTodoItem(Number(todoItemId))
+    const deletedTodoItem = await deleteTodoItem(Number(todoItemId))
+
+    if (!deletedTodoItem) {
+      res.status(404).json({ message: 'Todo item not found' })
+      return
+    }
+
+    const todoList = await getTodoListById(deletedTodoItem.listId)
+
+    if (!todoList) {
+      res.status(404).json({ message: 'Todo list not found' })
+      return
+    }
+
+    const io = getSocketIo()
+    io.to(todoList.uuid).emit('todoItemDeleted', deletedTodoItem)
 
     res.status(200).json({ message: 'Todo item deleted successfully' })
   } catch {

@@ -16,13 +16,24 @@ const TodoListPage = () => {
   useEffect(() => {
     socketClient.connect()
     console.log('Connected to socket.io')
-
     socketClient.emit('joinTodoList', todoListUUID)
 
-    socketClient.on('todoItemUpdated', (updatedTodoItem: TodoItem) => {
-      console.log('Received todoItemUpdated event: ', updatedTodoItem)
+    const handleTodoItemEvent = (event: string, todoItem: TodoItem) => {
+      console.log(`Received ${event} event: `, todoItem)
       refetch()
-    })
+    }
+
+    socketClient.on('todoItemCreated', (createdTodoItem: TodoItem) =>
+      handleTodoItemEvent('todoItemCreated', createdTodoItem)
+    )
+
+    socketClient.on('todoItemUpdated', (updatedTodoItem: TodoItem) =>
+      handleTodoItemEvent('todoItemUpdated', updatedTodoItem)
+    )
+
+    socketClient.on('todoItemDeleted', (deletedTodoItem: TodoItem) =>
+      handleTodoItemEvent('todoItemDeleted', deletedTodoItem)
+    )
 
     return () => {
       socketClient.disconnect()
