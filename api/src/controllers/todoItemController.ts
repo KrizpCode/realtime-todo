@@ -47,10 +47,8 @@ export const updateTodoItemHandler = async (
       return
     }
 
-    console.log('Emitting todoItemUpdated event', todoList.uuid)
-
     const io = getSocketIo()
-    io.to(todoList.uuid).emit('todoItemUpdated')
+    io.to(todoList.uuid).emit('todoItemUpdated', updatedTodoItem)
 
     res.status(200).json({ message: 'Todo item updated successfully' })
   } catch {

@@ -5,6 +5,7 @@ import CreateTodoItemForm from '../../components/CreateTodoItemForm'
 import TodoItemCard from '../../components/TodoItemCard'
 import { useEffect } from 'react'
 import socketClient from '../../services/socketClient'
+import { TodoItem } from '../../types/todoItem'
 
 const TodoListPage = () => {
   const { todoListUUID } = useParams({
@@ -18,8 +19,8 @@ const TodoListPage = () => {
 
     socketClient.emit('joinTodoList', todoListUUID)
 
-    socketClient.on('todoItemUpdated', () => {
-      console.log('Received todoItemUpdated event')
+    socketClient.on('todoItemUpdated', (updatedTodoItem: TodoItem) => {
+      console.log('Received todoItemUpdated event: ', updatedTodoItem)
       refetch()
     })
 
