@@ -101,8 +101,22 @@ export const login = async (req: TypedRequest<LoginDto>, res: Response) => {
 }
 
 export const logout = async (req: Request, res: Response) => {
-  res.clearCookie('authToken')
-  res.clearCookie('refreshToken')
+  res.clearCookie('authToken', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: isProduction,
+    domain,
+    path: '/'
+  })
+
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: isProduction,
+    domain,
+    path: '/'
+  })
+
   res.status(200).json({ message: 'Logged out successfully' })
 }
 
