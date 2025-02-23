@@ -1,4 +1,4 @@
-import { useUpdateTodoItem } from '../hooks/useTodoItems'
+import { useDeleteTodoItem, useUpdateTodoItem } from '../hooks/useTodoItems'
 import { TodoItem } from '../types/todoItem'
 
 interface TodoItemProps {
@@ -7,11 +7,17 @@ interface TodoItemProps {
 }
 
 const TodoItemCard = ({ todo, todoListUUID }: TodoItemProps) => {
-  const { mutate } = useUpdateTodoItem(todoListUUID)
+  const { mutate: updateTodoItem } = useUpdateTodoItem(todoListUUID)
+  const { mutate: deleteTodoItem } = useDeleteTodoItem(todoListUUID)
+
   const { completed, text, id } = todo
 
   const handleUpdateTodo = () => {
-    mutate({ completed: !completed, todoItemId: id })
+    updateTodoItem({ completed: !completed, todoItemId: id })
+  }
+
+  const handleDeleteTodo = () => {
+    deleteTodoItem(id)
   }
 
   return (
@@ -22,7 +28,10 @@ const TodoItemCard = ({ todo, todoListUUID }: TodoItemProps) => {
         onChange={() => handleUpdateTodo()}
       />
       <p className="grow">{text}</p>
-      <button className="flex items-center justify-center rounded-md bg-red-400 px-2">
+      <button
+        onClick={() => handleDeleteTodo()}
+        className="flex items-center justify-center rounded-md bg-red-400 px-2"
+      >
         <span className="font-medium text-white">X</span>
       </button>
     </div>

@@ -39,5 +39,17 @@ export const apiClient = {
     }
 
     return response.json()
+  },
+
+  delete: async (url: string) => {
+    const response = await fetch(url, {
+      method: 'DELETE'
+    })
+
+    if (!response.ok) {
+      throw new Error(`DELETE ${url} failed: ${response.statusText}`)
+    }
+
+    return response.json()
   }
 }

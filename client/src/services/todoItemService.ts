@@ -11,3 +11,6 @@ export const updateTodoItem = (
   todoItemId: TodoItem['id'],
   completed: TodoItem['completed']
 ) => apiClient.put<TodoItem>(`/api/todo-items/${todoItemId}`, { completed })
+
+export const deleteTodoItem = (todoItemId: TodoItem['id']) =>
+  apiClient.delete(`/api/todo-items/${todoItemId}`)

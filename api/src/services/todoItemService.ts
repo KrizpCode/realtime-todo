@@ -27,3 +27,11 @@ export const updateTodoItem = async (
     }
   })
 }
+
+export const deleteTodoItem = async (todoItemId: TodoItem['id']) => {
+  return await prisma.todoItem.delete({
+    where: {
+      id: todoItemId
+    }
+  })
+}

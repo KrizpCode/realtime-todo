@@ -1,7 +1,11 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 
 import { CreateTodoItemSchema } from '../schemas/todoItemSchemas'
-import { createTodoitem, updateTodoItem } from '../services/todoItemService'
+import {
+  createTodoitem,
+  deleteTodoItem,
+  updateTodoItem
+} from '../services/todoItemService'
 import { TypedRequest } from '../types/request'
 
 export const createTodoItemHandler = async (
@@ -30,6 +34,18 @@ export const updateTodoItemHandler = async (
     await updateTodoItem(Number(todoItemId), completed)
 
     res.status(200).json({ message: 'Todo item updated successfully' })
+  } catch {
+    res.status(500).json({ message: 'Something went wrong' })
+  }
+}
+
+export const deleteTodoItemHandler = async (req: Request, res: Response) => {
+  try {
+    const { todoItemId } = req.params
+
+    await deleteTodoItem(Number(todoItemId))
+
+    res.status(200).json({ message: 'Todo item deleted successfully' })
   } catch {
     res.status(500).json({ message: 'Something went wrong' })
   }
