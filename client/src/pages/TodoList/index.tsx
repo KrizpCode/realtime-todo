@@ -3,10 +3,26 @@ import { useParams } from '@tanstack/react-router'
 import { useTodoList } from '../../hooks/useTodoLists'
 import CreateTodoItemForm from '../../components/CreateTodoItemForm'
 import TodoItemCard from '../../components/TodoItemCard'
+import { useEffect } from 'react'
+import socketClient from '../../services/socketClient'
 
 const TodoListPage = () => {
-  const params = useParams({ from: '/_auth/todo-lists/$todoListUUID' })
-  const { data, isLoading } = useTodoList(params.todoListUUID)
+  const { todoListUUID } = useParams({
+    from: '/_auth/todo-lists/$todoListUUID'
+  })
+  const { data, isLoading } = useTodoList(todoListUUID)
+
+  useEffect(() => {
+    socketClient.connect()
+    console.log('Connected to socket.io')
+
+    socketClient.emit('joinTodoList', todoListUUID)
+
+    return () => {
+      socketClient.disconnect()
+      console.log('Disconnected from socket.io')
+    }
+  }, [todoListUUID])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -28,7 +44,7 @@ const TodoListPage = () => {
             <TodoItemCard
               key={todo.id}
               todo={todo}
-              todoListUUID={params.todoListUUID}
+              todoListUUID={todoListUUID}
             />
           )
         })}
