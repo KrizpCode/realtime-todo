@@ -25,10 +25,13 @@ export const authenticateUser = async (
 
       const newAuthToken = generateAuthToken(payload.userId)
 
+      const isProduction = process.env.NODE_ENV === 'production'
+
       res.cookie('authToken', newAuthToken, {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        secure: isProduction,
+        domain: isProduction ? '.taskmate.fun' : undefined,
         maxAge: 1000 * 60 * 15
       })
 

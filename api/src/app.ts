@@ -12,7 +12,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? 'https://johan-realtime-todo.vercel.app'
+        ? 'https://app.taskmate.fun'
         : ['http://localhost:3000'],
     credentials: true
   })
