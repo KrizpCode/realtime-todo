@@ -15,7 +15,7 @@
     "prettier:fix": "prettier --write .",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma migrate deploy && prisma generate"
   },
   "keywords": [],
   "author": "",
