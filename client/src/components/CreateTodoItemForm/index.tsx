@@ -3,7 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { TodoList } from '../../types/todoList'
 import { CreateTodoItemFormData, createTodoItemSchema } from './schema'
-import FormField from '../FormField'
 import { useCreateTodoItem } from '../../hooks/useTodoItems'
 
 interface CreateTodoItemFormProps {
@@ -20,7 +19,7 @@ const CreateTodoItemForm = ({ listId }: CreateTodoItemFormProps) => {
     formState: { errors, isSubmitting }
   } = useForm<CreateTodoItemFormData>({
     resolver: zodResolver(createTodoItemSchema),
-    mode: 'all'
+    mode: 'onChange'
   })
 
   const onSubmit = async (data: CreateTodoItemFormData) => {
@@ -29,19 +28,19 @@ const CreateTodoItemForm = ({ listId }: CreateTodoItemFormProps) => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} role="form">
-      <FormField
-        label="Text"
+    <form onSubmit={handleSubmit(onSubmit)} role="form" className="flex">
+      <input
+        {...register('text')}
+        id="text"
         name="text"
         type="text"
-        errors={errors}
-        registerProps={register('text')}
+        className={`grow rounded-l-md border-y-2 border-l-2 bg-gray-100 px-3 font-medium outline-0 hover:bg-gray-200 ${errors?.['text']?.message ? 'border-red-500' : 'border-gray-100 hover:border-gray-200 focus:border-blue-500'}`}
       />
       <button
         type="submit"
-        className={`w-full rounded-md bg-blue-500 p-2 text-white ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}`}
+        className={`rounded-r bg-blue-500 px-2 text-2xl font-bold text-white ${isSubmitting ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
       >
-        Add Todo Item
+        +
       </button>
     </form>
   )

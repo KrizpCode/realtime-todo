@@ -20,7 +20,7 @@ const Header = () => {
         <Link to="/">
           <img src="/logo.svg" alt="logo" className="h-8" />
         </Link>
-        <h1 className="text-xl font-semibold">Todo</h1>
+        <h1 className="text-xl font-semibold">TaskMate</h1>
       </div>
       <div className="center flex items-center gap-2 pr-4">
         {user ? (

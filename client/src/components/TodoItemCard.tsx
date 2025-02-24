@@ -20,13 +20,18 @@ const TodoItemCard = ({ todo }: TodoItemProps) => {
   }
 
   return (
-    <div className="flex items-center gap-2 rounded-md border border-gray-300 px-3 py-1 shadow-md">
+    <div
+      className={`flex items-center gap-2 rounded-md border border-gray-300 px-3 py-1 shadow-md ${completed ? 'bg-green-100 text-gray-700 opacity-70' : ''}`}
+    >
       <input
         type="checkbox"
         checked={completed}
         onChange={() => handleUpdateTodo()}
+        className="h-4 w-4 cursor-pointer"
       />
-      <p className="grow">{text}</p>
+      <p className={`grow font-medium ${completed ? 'line-through' : ''}`}>
+        {text}
+      </p>
       <button
         onClick={() => handleDeleteTodo()}
         className="flex items-center justify-center rounded-md bg-red-400 px-2"
