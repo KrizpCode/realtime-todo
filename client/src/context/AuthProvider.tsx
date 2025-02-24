@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter, useSearch } from '@tanstack/react-router'
 
 import { AuthContext } from './AuthContext'
 import {
@@ -18,6 +18,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter()
+  const search = useSearch({ strict: false })
   const { auth } = router.options.context
 
   const [user, setUser] = useState<User | null>(auth.user)
@@ -57,13 +58,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         const userData = await loginUser(data)
         syncAuthState(userData)
-        await router.navigate({ to: '/dashboard' })
+        await router.navigate({ to: search.redirect || '/dashboard' })
       } catch (error) {
         console.error('Login failed', error)
         // TODO: Display error message to user
       }
     },
-    [syncAuthState, router]
+    [syncAuthState, router, search.redirect]
   )
 
   const logout = useCallback(async () => {

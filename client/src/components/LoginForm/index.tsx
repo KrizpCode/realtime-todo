@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate, useRouter, useSearch } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 
 import { useAuth } from '../../hooks/useAuth'
 import FormField from '../FormField'
@@ -8,9 +8,6 @@ import { LoginFormData, LoginUserSchema } from './schema'
 
 const LoginForm = () => {
   const auth = useAuth()
-  const router = useRouter()
-  const navigate = useNavigate()
-  const search = useSearch({ strict: false })
 
   const {
     register,
@@ -22,15 +19,7 @@ const LoginForm = () => {
   })
 
   const onSubmit = async (data: LoginFormData) => {
-    try {
-      await auth.login(data)
-
-      await router.invalidate()
-
-      await navigate({ to: search.redirect || '/dashboard' })
-    } catch (error) {
-      console.error(error)
-    }
+    await auth.login(data)
   }
 
   return (

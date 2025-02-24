@@ -6,7 +6,7 @@ const HomePage = () => {
   const { isAuthenticated } = useAuth()
 
   return (
-    <div className="flex h-[calc(100vh-48px)] flex-col items-center justify-center gap-4 bg-[url(https://images.pexels.com/photos/796602/pexels-photo-796602.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=2160&w=3840)] bg-cover bg-center">
+    <div className="flex min-h-[calc(100vh-48px)] flex-col items-center justify-center gap-4 bg-[url(https://images.pexels.com/photos/796602/pexels-photo-796602.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=2160&w=3840)] bg-cover bg-center">
       <h1 className="font-shad text-4xl font-semibold">
         Welcome to{' '}
         <span className="font-bold underline decoration-[#006fff]">
