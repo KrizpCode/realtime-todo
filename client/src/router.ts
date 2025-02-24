@@ -9,7 +9,13 @@ export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   context: {
-    auth: undefined,
+    auth: {
+      user: null,
+      isAuthenticated: undefined,
+      login: async () => {},
+      register: async () => {},
+      logout: async () => {}
+    },
     queryClient
   }
 })

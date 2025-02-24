@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
 
 import { AuthContext } from './AuthContext'
 import {
@@ -16,56 +17,89 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+  const { auth } = router.options.context
 
+  const [user, setUser] = useState<User | null>(auth.user)
   const isAuthenticated = !!user
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    if (JSON.stringify(auth.user) !== JSON.stringify(user)) {
+      setUser(auth.user)
+    }
+  }, [auth.user, user])
+
+  const syncAuthState = useCallback(
+    (user: User | null) => {
+      setUser(user)
+      auth.user = user
+      auth.isAuthenticated = !!user
+    },
+    [auth]
+  )
+
+  const register = useCallback(
+    async (data: RegisterFormData) => {
       try {
-        const userData = await fetchUser()
-
-        setUser(userData)
-      } catch {
-        setUser(null)
+        const userData = await registerUser(data)
+        syncAuthState(userData)
+        await router.navigate({ to: '/dashboard' })
+      } catch (error) {
+        console.error('Registration failed', error)
+        // TODO: Display error message to user
       }
-    }
+    },
+    [syncAuthState, router]
+  )
 
-    fetchUserData()
-  }, [])
-
-  const register = useCallback(async (data: RegisterFormData) => {
-    try {
-      const userData = await registerUser(data)
-
-      setUser(userData)
-    } catch (error) {
-      console.error(error)
-      // TODO: Display error message to user
-    }
-  }, [])
-
-  const login = useCallback(async (data: LoginFormData) => {
-    try {
-      const userData = await loginUser(data)
-
-      setUser(userData)
-    } catch (error) {
-      console.error(error)
-      // TODO: Display error message to user
-    }
-  }, [])
+  const login = useCallback(
+    async (data: LoginFormData) => {
+      try {
+        const userData = await loginUser(data)
+        syncAuthState(userData)
+        await router.navigate({ to: '/dashboard' })
+      } catch (error) {
+        console.error('Login failed', error)
+        // TODO: Display error message to user
+      }
+    },
+    [syncAuthState, router]
+  )
 
   const logout = useCallback(async () => {
     try {
       await logoutUser()
+      syncAuthState(null)
+      await router.navigate({ to: '/login' })
     } catch (error) {
       console.error('Logout failed', error)
       // TODO: Display error message to user
-    } finally {
-      setUser(null)
     }
-  }, [])
+  }, [syncAuthState, router])
+
+  const refreshUser = useCallback(async () => {
+    try {
+      const userData = await fetchUser()
+      syncAuthState(userData)
+    } catch {
+      syncAuthState(null)
+      await router.navigate({ to: '/login' })
+      // TODO: Display error message to user
+    }
+  }, [syncAuthState, router])
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const interval = setInterval(
+      () => {
+        refreshUser()
+      },
+      1000 * 60 * 1
+    )
+
+    return () => clearInterval(interval)
+  }, [isAuthenticated, refreshUser])
 
   return (
     <AuthContext.Provider

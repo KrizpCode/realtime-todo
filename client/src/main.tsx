@@ -1,8 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { RouterProvider } from '@tanstack/react-router'
 
-import { AuthProvider } from './context/AuthProvider'
-import App from './App'
+import { queryClient, router } from './router'
 
 import './index.css'
 
@@ -13,9 +14,9 @@ if (!rootElement.innerHTML) {
 
   root.render(
     <StrictMode>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </StrictMode>
   )
 }

@@ -5,11 +5,23 @@ import { RegisterFormData } from '../components/RegisterForm/schema'
 import { User } from '../types/user'
 
 export interface AuthContextType {
-  isAuthenticated: boolean
+  isAuthenticated?: boolean
   user: User | null
   login: (data: LoginFormData) => Promise<void>
   register: (data: RegisterFormData) => Promise<void>
   logout: () => Promise<void>
 }
 
-export const AuthContext = createContext<AuthContextType | null>(null)
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  user: null,
+  login: async () => {
+    throw new Error('AuthProvider is not initialized')
+  },
+  register: async () => {
+    throw new Error('AuthProvider is not initialized')
+  },
+  logout: async () => {
+    throw new Error('AuthProvider is not initialized')
+  }
+})
