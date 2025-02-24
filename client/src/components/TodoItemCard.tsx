@@ -67,7 +67,7 @@ const TodoItemCard = ({ todo }: TodoItemProps) => {
           onKeyDown={(e) => handleEditTodo(e)}
           onBlur={() => handleEditTodo()}
           autoFocus
-          className={`grow px-2 font-medium outline-blue-500 ${isEditing ? 'block' : 'hidden'}`}
+          className={`} grow px-2 font-medium outline-blue-500`}
         />
       ) : (
         <p className={`grow font-medium ${completed ? 'line-through' : ''}`}>
@@ -76,10 +76,11 @@ const TodoItemCard = ({ todo }: TodoItemProps) => {
       )}
       <button
         onMouseDown={(e) => {
-          e.preventDefault() // ✅ Prevents focus loss triggering `onBlur`
+          e.preventDefault()
           setIsEditing((prevState) => !prevState)
         }}
-        className={`flex cursor-pointer items-center justify-center self-start rounded-md ${isEditing ? 'bg-blue-500 text-white' : 'bg-gray-200 text-blue-500'} p-1`}
+        disabled={completed}
+        className={`flex cursor-pointer items-center justify-center self-start rounded-md disabled:cursor-not-allowed ${isEditing ? 'bg-blue-500 text-white' : 'bg-gray-200 text-blue-500'} p-1`}
       >
         <FaPen className="min-h-4 min-w-4 text-inherit" />
       </button>
