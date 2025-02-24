@@ -1,11 +1,11 @@
+import { useEffect } from 'react'
 import { useParams } from '@tanstack/react-router'
 
 import { useTodoList } from '../../hooks/useTodoLists'
 import CreateTodoItemForm from '../../components/CreateTodoItemForm'
-import TodoItemCard from '../../components/TodoItemCard'
-import { useEffect } from 'react'
 import socketClient from '../../services/socketClient'
 import { TodoItem } from '../../types/todoItem'
+import TodoListTabView from '../../components/TodoListTabView'
 
 const TodoListPage = () => {
   const { todoListUUID } = useParams({
@@ -59,11 +59,7 @@ const TodoListPage = () => {
     <main className="p-4">
       <CreateTodoItemForm listId={listId} />
       <h1 className="my-3 text-center text-2xl font-bold">{name}</h1>
-      <div className="flex flex-col gap-2">
-        {todos.map((todo) => {
-          return <TodoItemCard key={todo.id} todo={todo} />
-        })}
-      </div>
+      <TodoListTabView todos={todos} />
     </main>
   )
 }
