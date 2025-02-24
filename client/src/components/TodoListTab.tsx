@@ -14,7 +14,7 @@ const TodoListTab = ({
   return (
     <button
       onClick={() => handleTabClick(tabName)}
-      className={`rounded px-3 py-1 text-sm font-medium capitalize ${
+      className={`cursor-pointer rounded px-3 py-1 text-sm font-medium capitalize ${
         tabName === currentTab ? 'bg-blue-500 text-white' : 'bg-gray-200'
       }`}
     >

@@ -34,7 +34,7 @@ const TodoItemCard = ({ todo }: TodoItemProps) => {
       </p>
       <button
         onClick={() => handleDeleteTodo()}
-        className="flex items-center justify-center rounded-md bg-red-400 px-2"
+        className="flex cursor-pointer items-center justify-center rounded-md bg-red-400 px-2"
       >
         <span className="font-medium text-white">X</span>
       </button>
