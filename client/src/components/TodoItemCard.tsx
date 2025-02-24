@@ -1,3 +1,5 @@
+import { IoClose } from 'react-icons/io5'
+
 import { useDeleteTodoItem, useUpdateTodoItem } from '../hooks/useTodoItems'
 import { TodoItem } from '../types/todoItem'
 
@@ -21,22 +23,22 @@ const TodoItemCard = ({ todo }: TodoItemProps) => {
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-md border border-gray-300 px-3 py-1 shadow-md ${completed ? 'bg-green-100 text-gray-700 opacity-70' : ''}`}
+      className={`flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 break-all shadow-md ${completed ? 'bg-green-100 text-gray-700 opacity-70' : ''}`}
     >
       <input
         type="checkbox"
         checked={completed}
         onChange={() => handleUpdateTodo()}
-        className="h-4 w-4 cursor-pointer"
+        className="min-h-6 min-w-6 cursor-pointer self-start"
       />
       <p className={`grow font-medium ${completed ? 'line-through' : ''}`}>
         {text}
       </p>
       <button
         onClick={() => handleDeleteTodo()}
-        className="flex cursor-pointer items-center justify-center rounded-md bg-red-400 px-2"
+        className="flex cursor-pointer items-center justify-center self-start rounded-md bg-red-400"
       >
-        <span className="font-medium text-white">X</span>
+        <IoClose className="min-h-6 min-w-6 text-white" />
       </button>
     </div>
   )
