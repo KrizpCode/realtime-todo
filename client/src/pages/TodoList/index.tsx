@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useParams } from '@tanstack/react-router'
 
 import { useTodoList } from '../../hooks/useTodoLists'
@@ -13,37 +13,53 @@ const TodoListPage = () => {
   })
   const { data, isLoading, refetch } = useTodoList(todoListUUID)
 
+  const handleTodoItemCreated = useCallback(
+    (createdTodoItem: TodoItem) => {
+      console.log('Received todoItemCreated event: ', createdTodoItem)
+      refetch()
+    },
+    [refetch]
+  )
+
+  const handleTodoItemUpdated = useCallback(
+    (updatedTodoItem: TodoItem) => {
+      console.log('Received todoItemUpdated event: ', updatedTodoItem)
+      refetch()
+    },
+    [refetch]
+  )
+
+  const handleTodoItemDeleted = useCallback(
+    (deletedTodoItem: TodoItem) => {
+      console.log('Received todoItemDeleted event: ', deletedTodoItem)
+      refetch()
+    },
+    [refetch]
+  )
+
   useEffect(() => {
     socketClient.connect()
     console.log('Connected to socket.io')
     socketClient.emit('joinTodoList', todoListUUID)
 
-    const handleTodoItemEvent = (event: string, todoItem: TodoItem) => {
-      console.log(`Received ${event} event: `, todoItem)
-      refetch()
-    }
-
-    socketClient.on('todoItemCreated', (createdTodoItem: TodoItem) =>
-      handleTodoItemEvent('todoItemCreated', createdTodoItem)
-    )
-
-    socketClient.on('todoItemUpdated', (updatedTodoItem: TodoItem) =>
-      handleTodoItemEvent('todoItemUpdated', updatedTodoItem)
-    )
-
-    socketClient.on('todoItemDeleted', (deletedTodoItem: TodoItem) =>
-      handleTodoItemEvent('todoItemDeleted', deletedTodoItem)
-    )
+    socketClient.on('todoItemCreated', handleTodoItemCreated)
+    socketClient.on('todoItemUpdated', handleTodoItemUpdated)
+    socketClient.on('todoItemDeleted', handleTodoItemDeleted)
 
     return () => {
-      socketClient.off('todoItemCreated', handleTodoItemEvent)
-      socketClient.off('todoItemUpdated', handleTodoItemEvent)
-      socketClient.off('todoItemDeleted', handleTodoItemEvent)
+      socketClient.off('todoItemCreated', handleTodoItemCreated)
+      socketClient.off('todoItemUpdated', handleTodoItemUpdated)
+      socketClient.off('todoItemDeleted', handleTodoItemDeleted)
 
       socketClient.disconnect()
       console.log('Disconnected from socket.io')
     }
-  }, [todoListUUID, refetch])
+  }, [
+    todoListUUID,
+    handleTodoItemCreated,
+    handleTodoItemUpdated,
+    handleTodoItemDeleted
+  ])
 
   if (isLoading) {
     return <div>Loading...</div>
