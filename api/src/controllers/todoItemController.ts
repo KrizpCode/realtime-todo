@@ -41,14 +41,21 @@ export const createTodoItemHandler = async (
 }
 
 export const updateTodoItemHandler = async (
-  req: TypedRequest<{ completed: boolean }, { todoItemId: string }>,
+  req: TypedRequest<
+    { completed: boolean; text: string },
+    { todoItemId: string }
+  >,
   res: Response
 ) => {
   try {
-    const { completed } = req.body
+    const { completed, text } = req.body
     const { todoItemId } = req.params
 
-    const updatedTodoItem = await updateTodoItem(Number(todoItemId), completed)
+    const updatedTodoItem = await updateTodoItem(
+      Number(todoItemId),
+      completed,
+      text
+    )
 
     if (!updatedTodoItem) {
       res.status(404).json({ message: 'Todo item not found' })

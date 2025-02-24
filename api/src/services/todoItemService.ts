@@ -16,14 +16,16 @@ export const createTodoitem = async (
 
 export const updateTodoItem = async (
   todoItemId: TodoItem['id'],
-  completed: TodoItem['completed']
+  completed: TodoItem['completed'],
+  text: TodoItem['text']
 ) => {
   return await prisma.todoItem.update({
     where: {
       id: todoItemId
     },
     data: {
-      completed
+      completed,
+      text
     }
   })
 }

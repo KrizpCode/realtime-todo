@@ -21,12 +21,13 @@ export const useCreateTodoItem = () => {
 interface UpdateTodoItemMutation {
   completed: boolean
   todoItemId: number
+  text: string
 }
 
 export const useUpdateTodoItem = () => {
   return useMutation({
-    mutationFn: ({ completed, todoItemId }: UpdateTodoItemMutation) =>
-      updateTodoItem(todoItemId, completed)
+    mutationFn: ({ completed, todoItemId, text }: UpdateTodoItemMutation) =>
+      updateTodoItem(todoItemId, completed, text)
   })
 }
 

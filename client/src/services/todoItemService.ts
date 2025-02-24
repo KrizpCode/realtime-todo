@@ -9,8 +9,10 @@ export const createTodoItem = (
 
 export const updateTodoItem = (
   todoItemId: TodoItem['id'],
-  completed: TodoItem['completed']
-) => apiClient.put<TodoItem>(`/api/todo-items/${todoItemId}`, { completed })
+  completed: TodoItem['completed'],
+  text: TodoItem['text']
+) =>
+  apiClient.put<TodoItem>(`/api/todo-items/${todoItemId}`, { completed, text })
 
 export const deleteTodoItem = (todoItemId: TodoItem['id']) =>
   apiClient.delete(`/api/todo-items/${todoItemId}`)
