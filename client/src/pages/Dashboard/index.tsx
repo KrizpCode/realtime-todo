@@ -1,7 +1,6 @@
-import { Link } from '@tanstack/react-router'
-
 import CreateTodoListForm from '../../components/CreateTodoListForm'
 import { useTodoLists } from '../../hooks/useTodoLists'
+import TodoListCard from '../../components/TodoListCard'
 
 const DashboardPage = () => {
   const { data: todoLists, isSuccess } = useTodoLists()
@@ -11,24 +10,19 @@ const DashboardPage = () => {
   }
 
   return (
-    <main className="p-4">
+    <main className="flex flex-col gap-4 p-4">
       <CreateTodoListForm />
-      {todoLists.map((todoList) => (
-        <Link
-          key={todoList.uuid}
-          to="/todo-lists/$todoListUUID"
-          params={{ todoListUUID: todoList.uuid }}
-          preload="intent"
-          className="block"
-        >
-          <div
-            key={todoList.uuid}
-            className="mb-4 rounded-md bg-white p-4 shadow"
-          >
-            <h2 className="text-xl font-semibold">{todoList.name}</h2>
+      <div className="flex flex-col gap-3">
+        {todoLists.length > 0 ? (
+          todoLists.map((todoList) => (
+            <TodoListCard key={todoList.id} todoList={todoList} />
+          ))
+        ) : (
+          <div className="bg-gray-100 p-4 py-2 text-lg font-medium text-gray-500">
+            You have no todo lists yet
           </div>
-        </Link>
-      ))}
+        )}
+      </div>
     </main>
   )
 }

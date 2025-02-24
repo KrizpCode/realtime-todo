@@ -34,6 +34,7 @@ const CreateTodoItemForm = ({ listId }: CreateTodoItemFormProps) => {
         id="text"
         name="text"
         type="text"
+        placeholder="What do you need to do?"
         className={`grow rounded-l-md border-y-2 border-l-2 bg-gray-100 px-3 font-medium outline-0 hover:bg-gray-200 ${errors?.['text']?.message ? 'border-red-500' : 'border-gray-100 hover:border-gray-200 focus:border-blue-500'}`}
       />
       <button
