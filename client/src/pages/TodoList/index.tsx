@@ -61,13 +61,7 @@ const TodoListPage = () => {
       <CreateTodoItemForm listId={listId} />
       <div className="mt-6 flex flex-col gap-2">
         {todos.map((todo) => {
-          return (
-            <TodoItemCard
-              key={todo.id}
-              todo={todo}
-              todoListUUID={todoListUUID}
-            />
-          )
+          return <TodoItemCard key={todo.id} todo={todo} />
         })}
       </div>
     </main>

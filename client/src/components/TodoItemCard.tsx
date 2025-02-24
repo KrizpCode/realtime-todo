@@ -3,12 +3,11 @@ import { TodoItem } from '../types/todoItem'
 
 interface TodoItemProps {
   todo: TodoItem
-  todoListUUID: string
 }
 
-const TodoItemCard = ({ todo, todoListUUID }: TodoItemProps) => {
-  const { mutate: updateTodoItem } = useUpdateTodoItem(todoListUUID)
-  const { mutate: deleteTodoItem } = useDeleteTodoItem(todoListUUID)
+const TodoItemCard = ({ todo }: TodoItemProps) => {
+  const { mutate: updateTodoItem } = useUpdateTodoItem()
+  const { mutate: deleteTodoItem } = useDeleteTodoItem()
 
   const { completed, text, id } = todo
 

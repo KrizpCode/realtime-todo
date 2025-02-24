@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import {
   createTodoItem,
   deleteTodoItem,
@@ -11,14 +11,10 @@ interface CreateTodoItemMutation {
   text: string
 }
 
-export const useCreateTodoItem = (todoListUUID: string) => {
-  const queryClient = useQueryClient()
-
+export const useCreateTodoItem = () => {
   return useMutation({
     mutationFn: ({ listId, text }: CreateTodoItemMutation) =>
-      createTodoItem(listId, text),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['todoList', todoListUUID] })
+      createTodoItem(listId, text)
   })
 }
 
@@ -27,23 +23,15 @@ interface UpdateTodoItemMutation {
   todoItemId: number
 }
 
-export const useUpdateTodoItem = (todoListUUID: string) => {
-  const queryClient = useQueryClient()
-
+export const useUpdateTodoItem = () => {
   return useMutation({
     mutationFn: ({ completed, todoItemId }: UpdateTodoItemMutation) =>
-      updateTodoItem(todoItemId, completed),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['todoList', todoListUUID] })
+      updateTodoItem(todoItemId, completed)
   })
 }
 
-export const useDeleteTodoItem = (todoListUUID: string) => {
-  const queryClient = useQueryClient()
-
+export const useDeleteTodoItem = () => {
   return useMutation({
-    mutationFn: (todoItemId: number) => deleteTodoItem(todoItemId),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['todoList', todoListUUID] })
+    mutationFn: (todoItemId: number) => deleteTodoItem(todoItemId)
   })
 }
