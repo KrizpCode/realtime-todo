@@ -14,5 +14,6 @@ export const Route = createFileRoute('/_auth/todo-lists/$todoListUUID')({
     opts.context.queryClient.ensureQueryData(
       todoListQueryOptions(opts.params.todoListUUID)
     ),
+  preload: false,
   component: TodoListPage
 })
