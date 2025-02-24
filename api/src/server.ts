@@ -12,5 +12,10 @@ const server = http.createServer(app)
 initializeSocketIo(server)
 
 server.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`)
+  const baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? `https://api.taskmate.fun`
+      : `http://localhost:${port}`
+
+  console.log(`Server is running at ${baseUrl}`)
 })

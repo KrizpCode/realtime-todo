@@ -10,6 +10,13 @@ export const createTodoitem = async (
     data: {
       text,
       listId: listId
+    },
+    include: {
+      list: {
+        select: {
+          uuid: true
+        }
+      }
     }
   })
 }
@@ -26,6 +33,13 @@ export const updateTodoItem = async (
     data: {
       completed,
       text
+    },
+    include: {
+      list: {
+        select: {
+          uuid: true
+        }
+      }
     }
   })
 }
@@ -34,6 +48,13 @@ export const deleteTodoItem = async (todoItemId: TodoItem['id']) => {
   return await prisma.todoItem.delete({
     where: {
       id: todoItemId
+    },
+    include: {
+      list: {
+        select: {
+          uuid: true
+        }
+      }
     }
   })
 }

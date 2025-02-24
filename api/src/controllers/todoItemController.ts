@@ -11,7 +11,6 @@ import {
 } from '../services/todoItemService'
 import { TypedRequest } from '../types/request'
 import { getSocketIo } from '../socketIo'
-import { getTodoListById } from '../services/todoListService'
 
 export const createTodoItemHandler = async (
   req: TypedRequest<CreateTodoItemDto>,
@@ -22,20 +21,15 @@ export const createTodoItemHandler = async (
 
     const createdTodoItem = await createTodoitem(listId, text)
 
-    if (!createdTodoItem) {
+    if (!createdTodoItem || !createdTodoItem.list) {
       res.status(404).json({ message: 'Todo list not found' })
       return
     }
 
-    const todoList = await getTodoListById(listId)
-
-    if (!todoList) {
-      res.status(404).json({ message: 'Todo list not found' })
-      return
-    }
+    const { list, ...todoItemResponse } = createdTodoItem
 
     const io = getSocketIo()
-    io.to(todoList.uuid).emit('todoItemCreated', createdTodoItem)
+    io.to(list.uuid).emit('todoItemCreated', todoItemResponse)
 
     res.status(201).json({ message: 'Todo item created successfully' })
   } catch {
@@ -57,20 +51,15 @@ export const updateTodoItemHandler = async (
       text
     )
 
-    if (!updatedTodoItem) {
+    if (!updatedTodoItem || !updatedTodoItem.list) {
       res.status(404).json({ message: 'Todo item not found' })
       return
     }
 
-    const todoList = await getTodoListById(updatedTodoItem.listId)
-
-    if (!todoList) {
-      res.status(404).json({ message: 'Todo list not found' })
-      return
-    }
+    const { list, ...todoItemResponse } = updatedTodoItem
 
     const io = getSocketIo()
-    io.to(todoList.uuid).emit('todoItemUpdated', updatedTodoItem)
+    io.to(list.uuid).emit('todoItemUpdated', todoItemResponse)
 
     res.status(200).json({ message: 'Todo item updated successfully' })
   } catch {
@@ -84,20 +73,15 @@ export const deleteTodoItemHandler = async (req: Request, res: Response) => {
 
     const deletedTodoItem = await deleteTodoItem(Number(todoItemId))
 
-    if (!deletedTodoItem) {
+    if (!deletedTodoItem || !deletedTodoItem.list) {
       res.status(404).json({ message: 'Todo item not found' })
       return
     }
 
-    const todoList = await getTodoListById(deletedTodoItem.listId)
-
-    if (!todoList) {
-      res.status(404).json({ message: 'Todo list not found' })
-      return
-    }
+    const { list, ...deletedTodoItemResponse } = deletedTodoItem
 
     const io = getSocketIo()
-    io.to(todoList.uuid).emit('todoItemDeleted', deletedTodoItem)
+    io.to(list.uuid).emit('todoItemDeleted', deletedTodoItemResponse)
 
     res.status(200).json({ message: 'Todo item deleted successfully' })
   } catch {
