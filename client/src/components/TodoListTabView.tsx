@@ -32,7 +32,7 @@ const TodoListTabView = ({ todos }: TodoListTabViewProps) => {
   const tabs = ['all', 'active', 'completed'] as TodoListTabViewName[]
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 pt-3">
       <div className="flex gap-2">
         {tabs.map((tabName: TodoListTabViewName) => (
           <TodoListTab
