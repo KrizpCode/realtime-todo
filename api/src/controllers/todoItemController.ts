@@ -1,6 +1,9 @@
 import { Response, Request } from 'express'
 
-import { CreateTodoItemSchema } from '../schemas/todoItemSchemas'
+import {
+  CreateTodoItemDto,
+  UpdateTodoItemDto
+} from '../schemas/todoItemSchemas'
 import {
   createTodoitem,
   deleteTodoItem,
@@ -11,7 +14,7 @@ import { getSocketIo } from '../socketIo'
 import { getTodoListById } from '../services/todoListService'
 
 export const createTodoItemHandler = async (
-  req: TypedRequest<CreateTodoItemSchema>,
+  req: TypedRequest<CreateTodoItemDto>,
   res: Response
 ) => {
   try {
@@ -41,10 +44,7 @@ export const createTodoItemHandler = async (
 }
 
 export const updateTodoItemHandler = async (
-  req: TypedRequest<
-    { completed: boolean; text: string },
-    { todoItemId: string }
-  >,
+  req: TypedRequest<UpdateTodoItemDto, { todoItemId: string }>,
   res: Response
 ) => {
   try {

@@ -5,4 +5,11 @@ export const createTodoItemSchema = z.object({
   listId: z.number().positive()
 })
 
-export type CreateTodoItemSchema = z.infer<typeof createTodoItemSchema>
+export type CreateTodoItemDto = z.infer<typeof createTodoItemSchema>
+
+export const updateTodoItemSchema = z.object({
+  text: z.string().nonempty('Name is required').max(500, 'Text is too long'),
+  completed: z.boolean()
+})
+
+export type UpdateTodoItemDto = z.infer<typeof updateTodoItemSchema>
