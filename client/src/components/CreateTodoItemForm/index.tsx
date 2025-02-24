@@ -28,7 +28,7 @@ const CreateTodoItemForm = ({ listId }: CreateTodoItemFormProps) => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} role="form" className="flex">
+    <form onSubmit={handleSubmit(onSubmit)} role="form" className="my-4 flex">
       <input
         {...register('text')}
         id="text"

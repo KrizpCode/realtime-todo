@@ -10,7 +10,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <main className="flex flex-col gap-4 p-4">
+    <main className="flex min-h-[calc(100vh-48px)] flex-col gap-4 p-4 md:px-20 lg:px-40 xl:px-60">
       <CreateTodoListForm />
       <div className="flex flex-col gap-3">
         {todoLists.length > 0 ? (

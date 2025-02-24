@@ -56,7 +56,7 @@ const TodoListPage = () => {
   const { id: listId, name, todos } = data
 
   return (
-    <main className="p-4">
+    <main className="min-h-[calc(100vh-48px)] p-4 md:px-20 lg:px-40 xl:px-60">
       <CreateTodoItemForm listId={listId} />
       <h1 className="my-3 text-center text-2xl font-bold">{name}</h1>
       <TodoListTabView todos={todos} />
