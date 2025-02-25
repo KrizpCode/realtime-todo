@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import http from 'http'
 
 import app from './app'
+import logger from './config/logger'
 import { initializeSocketIo } from './socketIo'
 
 dotenv.config()
@@ -17,5 +18,5 @@ server.listen(port, () => {
       ? `https://api.taskmate.fun`
       : `http://localhost:${port}`
 
-  console.log(`Server is running at ${baseUrl}`)
+  logger.info(`Server is running at ${baseUrl}`)
 })

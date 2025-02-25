@@ -2,6 +2,7 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 
+import requestLogger from './middlewares/requestLogger'
 import authRoutes from './routes/authRoutes'
 import todoListRoutes from './routes/todoListRoutes'
 import todoItemRoutes from './routes/todoItemRoutes'
@@ -20,6 +21,8 @@ app.use(
 
 app.use(express.json())
 app.use(cookieParser())
+
+app.use(requestLogger)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/todo-lists', todoListRoutes)

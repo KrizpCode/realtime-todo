@@ -1,5 +1,6 @@
 import { Server as HttpServer } from 'http'
 import { Server as SocketServer } from 'socket.io'
+import logger from './config/logger'
 
 let io: SocketServer
 
@@ -15,15 +16,15 @@ export const initializeSocketIo = (server: HttpServer) => {
   })
 
   io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`)
+    logger.info(`User connected: ${socket.id}`)
 
     socket.on('joinTodoList', (todoListUUID: string) => {
       socket.join(todoListUUID)
-      console.log(`Client ${socket.id} joined todo list ${todoListUUID}`)
+      logger.info(`Client ${socket.id} joined todo list ${todoListUUID}`)
     })
 
     socket.on('disconnect', () => {
-      console.log(`User disconnected: ${socket.id}`)
+      logger.info(`User disconnected: ${socket.id}`)
     })
   })
 
