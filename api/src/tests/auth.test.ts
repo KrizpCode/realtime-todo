@@ -7,17 +7,12 @@ import {
   it
 } from '@jest/globals'
 import request from 'supertest'
-import bcrypt from 'bcryptjs'
 
 import { prisma } from '../db/client'
 import app from '../app'
-import { getUserByEmail } from '../services/userService'
+import { createUser, getUserByEmail } from '../services/userService'
 
-const validUser = {
-  email: 'test@test.com',
-  password: 'password123',
-  name: 'Test User'
-}
+const generateUniqueEmail = () => `test+${Date.now()}@test.com`
 
 const registerUser = async (user: Partial<typeof validUser>) => {
   return request(app).post('/api/auth/register').send(user)
@@ -27,26 +22,34 @@ const loginUser = async (user: Partial<typeof validUser>) => {
   return request(app).post('/api/auth/login').send(user)
 }
 
+const userCleanup = async (userId: number) => {
+  await prisma.user.delete({
+    where: { id: userId }
+  })
+}
+
+let validUser: { email: string; password: string; name: string }
 let testUserId: number | null = null
 
 beforeEach(async () => {
-  await prisma.$transaction(async (prisma) => {
-    const user = await prisma.user.create({
-      data: {
-        email: validUser.email,
-        password: await bcrypt.hash(validUser.password, 10),
-        name: validUser.name
-      }
-    })
-    testUserId = user.id
-  })
+  validUser = {
+    email: generateUniqueEmail(),
+    password: 'password123',
+    name: 'Test User'
+  }
+
+  const user = await createUser(
+    validUser.email,
+    validUser.password,
+    validUser.name
+  )
+
+  testUserId = user.id
 })
 
 afterEach(async () => {
   if (testUserId) {
-    await prisma.user.delete({
-      where: { id: testUserId }
-    })
+    userCleanup(testUserId)
   }
 })
 
@@ -66,6 +69,10 @@ describe('Authentication - Register', () => {
 
     const user = await getUserByEmail('newuser@test.com')
     expect(user).toBeDefined()
+
+    if (user) {
+      await userCleanup(user.id)
+    }
   })
 
   it('should not allow duplicate email registration', async () => {
@@ -142,13 +149,11 @@ describe('Authentication - Refresh Token', () => {
     const loginRes = await loginUser(validUser)
     expect(loginRes.status).toBe(200)
 
-    // Extract cookies
     const cookies = loginRes.headers['set-cookie'] as unknown as string[]
     const refreshOnlyCookies = cookies.filter((cookie) =>
       cookie.startsWith('refreshToken')
     )
 
-    // Simulate a request with only refreshToken (no authToken)
     const res = await request(app)
       .get('/api/auth/me')
       .set('Cookie', refreshOnlyCookies)
