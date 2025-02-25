@@ -1,20 +1,20 @@
 import {
-  beforeEach,
   afterEach,
   afterAll,
   describe,
   expect,
-  it
+  it,
+  beforeAll
 } from '@jest/globals'
 import request from 'supertest'
 
 import app from '../app'
 import { prisma } from '../db/client'
-import { createUser } from '../services/userService'
 import { createTodoList as createTodoListService } from '../services/todoListService'
+import { createUser } from '../services/userService'
 
 const validUser = {
-  email: 'test@test.com',
+  email: 'testingTodoList@test.com',
   password: 'password123',
   name: 'Test User'
 }
@@ -41,12 +41,13 @@ const getTodoListByUUID = async (cookies: string[], uuid: string) => {
 let authCookies: string[]
 let testUserId: number | null = null
 
-beforeEach(async () => {
+beforeAll(async () => {
   const user = await createUser(
     validUser.email,
     validUser.password,
     validUser.name
   )
+
   testUserId = user.id
 
   const loginRes = await loginUser(validUser)
@@ -58,7 +59,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   if (testUserId) {
-    await prisma.user.delete({ where: { id: testUserId } })
+    await prisma.todoList.deleteMany({ where: { ownerId: testUserId } })
   }
 })
 
@@ -108,5 +109,24 @@ describe('Todo Lists - CRUD', () => {
 
     expect(res.status).toBe(401)
     expect(res.body.message).toBe('Unauthorized')
+  })
+
+  it('should return 400 with validation error if the name is empty', async () => {
+    const res = await createTodoList(authCookies, '')
+
+    expect(res.status).toBe(400)
+    expect(res.body.errors.name).toBe('Name is required')
+  })
+
+  it('should return 400 with validation error if the name is over 255 characters', async () => {
+    const res = await createTodoList(
+      authCookies,
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam venenatis felis eget augue tincidunt, vel ultricies justo vehicula. Phasellus pharetra, sapien nec convallis efficitur, lectus nisi bibendum purus, nec vehicula turpis justo eu augue. Integer suscipit, elit nec bibendum eleifend, sapien eros malesuada nunc.'
+    )
+
+    expect(res.status).toBe(400)
+    expect(res.body.errors.name).toBe(
+      'Name cannot be longer than 255 characters'
+    )
   })
 })
