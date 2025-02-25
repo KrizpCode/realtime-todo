@@ -20,7 +20,7 @@ model TodoList {
   uuid      String     @unique @default(uuid())
   name      String
   ownerId   Int
-  owner     User       @relation(fields: [ownerId], references: [id])
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   todos     TodoItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -31,7 +31,7 @@ model TodoItem {
   text      String
   completed Boolean  @default(false)
   listId    Int
-  list      TodoList @relation(fields: [listId], references: [id])
+  list      TodoList @relation(fields: [listId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
