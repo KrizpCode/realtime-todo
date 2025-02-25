@@ -111,7 +111,10 @@ describe('Authentication - Login', () => {
     })
 
     expect(res.status).toBe(401)
-    expect(res.body).toEqual({ message: 'Invalid credentials' })
+    expect(res.body).toEqual({
+      status: 401,
+      message: 'Invalid credentials'
+    })
   })
 
   it('should return 401 if password is incorrect', async () => {
@@ -121,7 +124,7 @@ describe('Authentication - Login', () => {
     })
 
     expect(res.status).toBe(401)
-    expect(res.body).toEqual({ message: 'Invalid credentials' })
+    expect(res.body).toEqual({ status: 401, message: 'Invalid credentials' })
   })
 })
 

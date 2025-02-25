@@ -1,17 +1,18 @@
-import { Request, Response } from 'express'
-import bcrypt from 'bcryptjs'
+import { NextFunction, Request, Response } from 'express'
 
 import { LoginDto, RegisterDto } from '../schemas/authSchemas'
 import { TypedRequest } from '../types/request'
 import {
   createUser,
   getUserByEmail,
-  getUserById
+  getUserById,
+  loginUser
 } from '../services/userService'
 import {
   generateAuthToken,
   generateRefreshToken
 } from '../helpers/tokenHelpers'
+import { setAuthCookies } from '../helpers/setAuthCookies'
 
 const isProduction = process.env.NODE_ENV === 'production'
 const domain = isProduction ? '.taskmate.fun' : undefined
@@ -63,41 +64,25 @@ export const register = async (
   })
 }
 
-export const login = async (req: TypedRequest<LoginDto>, res: Response) => {
-  const { email: loginEmail, password } = req.body
+export const login = async (
+  req: TypedRequest<LoginDto>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password } = req.body
 
-  const user = await getUserByEmail(loginEmail)
-  const passwordMatch = user && (await bcrypt.compare(password, user.password))
+    const { user, authToken, refreshToken } = await loginUser(email, password)
 
-  if (!user || !passwordMatch) {
-    res.status(401).json({ message: 'Invalid credentials' })
-    return
+    setAuthCookies(res, authToken, refreshToken)
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: { userId: user.id, email: user.email, name: user.name }
+    })
+  } catch (error) {
+    next(error)
   }
-
-  const { id: userId, email, name } = user
-
-  const authToken = generateAuthToken(userId)
-  const refreshToken = generateRefreshToken(userId)
-
-  res.cookie('authToken', authToken, {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: isProduction,
-    domain,
-    maxAge: 1000 * 60 * 15
-  })
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: isProduction,
-    domain,
-    maxAge: 1000 * 60 * 60 * 24 * 30
-  })
-
-  res
-    .status(200)
-    .json({ message: 'Login successful', user: { userId, email, name } })
 }
 
 export const logout = async (req: Request, res: Response) => {
