@@ -6,6 +6,7 @@ import requestLogger from './middlewares/requestLogger'
 import authRoutes from './routes/authRoutes'
 import todoListRoutes from './routes/todoListRoutes'
 import todoItemRoutes from './routes/todoItemRoutes'
+import { errorMiddleware } from './middlewares/errorHandler'
 
 const app = express()
 
@@ -27,5 +28,7 @@ app.use(requestLogger)
 app.use('/api/auth', authRoutes)
 app.use('/api/todo-lists', todoListRoutes)
 app.use('/api/todo-items', todoItemRoutes)
+
+app.use(errorMiddleware)
 
 export default app
