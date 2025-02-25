@@ -19,7 +19,7 @@ export const createTodoItemHandler = async (
   try {
     const { text, listId } = req.body
 
-    const createdTodoItem = await createTodoitem(listId, text)
+    const createdTodoItem = await createTodoitem(listId, text).catch(() => {})
 
     if (!createdTodoItem || !createdTodoItem.list) {
       res.status(404).json({ message: 'Todo list not found' })
@@ -49,7 +49,7 @@ export const updateTodoItemHandler = async (
       Number(todoItemId),
       completed,
       text
-    )
+    ).catch(() => {})
 
     if (!updatedTodoItem || !updatedTodoItem.list) {
       res.status(404).json({ message: 'Todo item not found' })
@@ -71,7 +71,9 @@ export const deleteTodoItemHandler = async (req: Request, res: Response) => {
   try {
     const { todoItemId } = req.params
 
-    const deletedTodoItem = await deleteTodoItem(Number(todoItemId))
+    const deletedTodoItem = await deleteTodoItem(Number(todoItemId)).catch(
+      () => {}
+    )
 
     if (!deletedTodoItem || !deletedTodoItem.list) {
       res.status(404).json({ message: 'Todo item not found' })

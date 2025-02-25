@@ -52,9 +52,11 @@ beforeAll(async () => {
 
   const loginRes = await loginUser(validUser)
 
-  authCookies = Array.isArray(loginRes.headers['set-cookie'])
-    ? loginRes.headers['set-cookie']
-    : [loginRes.headers['set-cookie']]
+  authCookies =
+    loginRes.headers['set-cookie'] &&
+    Array.isArray(loginRes.headers['set-cookie'])
+      ? loginRes.headers['set-cookie']
+      : []
 })
 
 afterEach(async () => {
@@ -64,6 +66,10 @@ afterEach(async () => {
 })
 
 afterAll(async () => {
+  if (testUserId) {
+    await prisma.user.delete({ where: { id: testUserId } })
+  }
+
   await prisma.$disconnect()
 })
 
