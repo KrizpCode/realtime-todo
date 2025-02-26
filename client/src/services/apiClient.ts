@@ -18,74 +18,42 @@ const getUrl = (urlPath: string) => {
   return `${VITE_API_BASE_URL}${normalizedPath}`
 }
 
-export const apiClient = {
-  get: async <T>(urlPath: string): Promise<T> => {
+const request = async <T>(
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+  urlPath: string,
+  body?: unknown
+): Promise<T> => {
+  try {
     const response = await fetch(getUrl(urlPath), {
-      credentials: 'include'
-    })
-
-    if (!response.ok) {
-      throw new Error(`GET ${urlPath} failed: ${response.statusText}`)
-    }
-
-    return response.json()
-  },
-
-  post: async <T>(urlPath: string, body?: unknown): Promise<T> => {
-    try {
-      const response = await fetch(getUrl(urlPath), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: body ? JSON.stringify(body) : undefined
-      })
-
-      const responseData = await response.json().catch(() => null)
-
-      if (!response.ok) {
-        throw new ApiError(
-          response.status,
-          responseData?.message || 'Request failed'
-        )
-      }
-
-      return responseData
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error
-      }
-
-      throw new ApiError(500, 'An unexpected error occurred')
-    }
-  },
-
-  put: async <T>(urlPath: string, body: unknown): Promise<T> => {
-    const response = await fetch(getUrl(urlPath), {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
       credentials: 'include',
-      body: JSON.stringify(body)
+      body: body ? JSON.stringify(body) : undefined
     })
 
-    if (!response.ok) {
-      throw new Error(`PUT ${urlPath} failed: ${response.statusText}`)
-    }
-
-    return response.json()
-  },
-
-  delete: async (urlPath: string) => {
-    const response = await fetch(getUrl(urlPath), {
-      method: 'DELETE',
-      credentials: 'include'
-    })
+    const responseData = await response.json().catch(() => null)
 
     if (!response.ok) {
-      throw new Error(`DELETE ${urlPath} failed: ${response.statusText}`)
+      throw new ApiError(
+        response.status,
+        responseData?.message || 'Request failed'
+      )
     }
 
-    return response.json()
+    return responseData
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error
+    }
+
+    throw new ApiError(500, 'An unexpected error occurred')
   }
+}
+
+export const apiClient = {
+  get: <T>(urlPath: string) => request<T>('GET', urlPath),
+  post: <T>(urlPath: string, body?: unknown) =>
+    request<T>('POST', urlPath, body),
+  put: <T>(urlPath: string, body: unknown) => request<T>('PUT', urlPath, body),
+  delete: <T>(urlPath: string) => request<T>('DELETE', urlPath)
 }
