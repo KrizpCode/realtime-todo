@@ -18,12 +18,8 @@ export const errorMiddleware = (
     if (err.code === 'P2025') {
       const resource = getResourceNameFromPath(req)
 
-      res.status(404).json({
-        status: statusCode,
-        message: `${resource} not found`
-      })
-
-      return
+      statusCode = 404
+      message = `${resource} not found`
     }
   }
 
