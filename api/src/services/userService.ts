@@ -8,6 +8,7 @@ import {
   generateAuthToken,
   generateRefreshToken
 } from '../helpers/tokenHelpers'
+import { NotFoundError } from '../errors/NotFoundError'
 
 export const getUserByEmail = async (email: string) => {
   return prisma.user.findUnique({ where: { email } })
@@ -74,7 +75,7 @@ export const getMe = async (userId: number) => {
   const user = await getUserById(userId)
 
   if (!user) {
-    throw new AuthenticationError('User not found')
+    throw new NotFoundError('User not found')
   }
 
   return { id: user.id, email: user.email, name: user.name }

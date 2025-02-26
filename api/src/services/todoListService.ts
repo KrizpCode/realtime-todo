@@ -1,29 +1,25 @@
-import { TodoList, User } from '@prisma/client'
-
 import { prisma } from '../db/client'
+import { NotFoundError } from '../errors/NotFoundError'
 
-export const createTodoList = async (
-  userId: User['id'],
-  name: TodoList['name']
-) => {
+export const createTodoList = async (ownerId: number, name: string) => {
   return await prisma.todoList.create({
     data: {
       name,
-      ownerId: userId
+      ownerId
     }
   })
 }
 
-export const getTodoListsByUserId = async (userId: User['id']) => {
+export const getTodoListsByUserId = async (ownerId: number) => {
   return await prisma.todoList.findMany({
     where: {
-      ownerId: userId
+      ownerId
     }
   })
 }
 
-export const getTodoListByUUID = async (uuid: TodoList['uuid']) => {
-  return await prisma.todoList.findUnique({
+export const getTodoListByUUID = async (uuid: string) => {
+  const todoList = await prisma.todoList.findUnique({
     where: {
       uuid
     },
@@ -35,4 +31,10 @@ export const getTodoListByUUID = async (uuid: TodoList['uuid']) => {
       }
     }
   })
+
+  if (!todoList) {
+    throw new NotFoundError('Todo list not found')
+  }
+
+  return todoList
 }

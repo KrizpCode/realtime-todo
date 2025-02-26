@@ -65,13 +65,11 @@ export const getAuthenticatedUser = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req
-
     if (typeof req.userId !== 'number') {
       throw new AuthenticationError('Unauthorized')
     }
 
-    const user = getMe(userId as number)
+    const user = getMe(req.userId as number)
 
     res.status(200).json({ user })
   } catch (error) {
