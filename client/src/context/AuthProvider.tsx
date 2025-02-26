@@ -11,6 +11,7 @@ import {
 import { User } from '../types/user'
 import { LoginFormData } from '../components/LoginForm/schema'
 import { RegisterFormData } from '../components/RegisterForm/schema'
+import { ApiError } from '../services/apiClient'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -43,11 +44,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async (data: RegisterFormData) => {
       try {
         const userData = await registerUser(data)
-        syncAuthState(userData)
+        syncAuthState(userData.user)
+
         await router.navigate({ to: '/dashboard' })
+
+        return { success: true }
       } catch (error) {
-        console.error('Registration failed', error)
-        // TODO: Display error message to user
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : 'An unexpected error occurred'
+
+        return {
+          success: false,
+          message
+        }
       }
     },
     [syncAuthState, router]
@@ -57,11 +68,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     async (data: LoginFormData) => {
       try {
         const userData = await loginUser(data)
-        syncAuthState(userData)
+        syncAuthState(userData.user)
+
         await router.navigate({ to: search.redirect || '/dashboard' })
+
+        return { success: true }
       } catch (error) {
-        console.error('Login failed', error)
-        // TODO: Display error message to user
+        const message =
+          error instanceof ApiError
+            ? error.message
+            : 'An unexpected error occurred'
+
+        return {
+          success: false,
+          message
+        }
       }
     },
     [syncAuthState, router, search.redirect]

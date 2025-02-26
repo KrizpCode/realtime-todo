@@ -4,18 +4,11 @@ import { User } from '../types/user'
 import { apiClient } from './apiClient'
 
 export const registerUser = async (data: RegisterFormData) => {
-  const response = await apiClient.post<{ user: User }>(
-    '/api/auth/register',
-    data
-  )
-
-  return response.user
+  return await apiClient.post<{ user: User }>('/api/auth/register', data)
 }
 
 export const loginUser = async (data: LoginFormData) => {
-  const response = await apiClient.post<{ user: User }>('/api/auth/login', data)
-
-  return response.user
+  return await apiClient.post<{ user: User }>('/api/auth/login', data)
 }
 
 export const logoutUser = async () => {

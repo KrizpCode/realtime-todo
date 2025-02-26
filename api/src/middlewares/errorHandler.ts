@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 import logger from '../config/logger'
 import { ApiError } from '../errors/ApiError'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { getResourceNameFromPath } from '../helpers/resourceHelpers'
 
 export const errorMiddleware = (

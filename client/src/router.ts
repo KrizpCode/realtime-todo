@@ -12,8 +12,10 @@ export const router = createRouter({
     auth: {
       user: null,
       isAuthenticated: undefined,
-      login: async () => {},
-      register: async () => {},
+      login: async () => ({ success: false }),
+      register: async () => ({
+        success: false
+      }),
       logout: async () => {}
     },
     queryClient

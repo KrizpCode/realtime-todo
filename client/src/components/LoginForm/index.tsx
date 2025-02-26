@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
@@ -8,6 +9,9 @@ import { LoginFormData, LoginUserSchema } from './schema'
 
 const LoginForm = () => {
   const auth = useAuth()
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  )
 
   const {
     register,
@@ -19,7 +23,11 @@ const LoginForm = () => {
   })
 
   const onSubmit = async (data: LoginFormData) => {
-    await auth.login(data)
+    const result = await auth.login(data)
+
+    if (!result.success) {
+      setErrorMessage(result.message)
+    }
   }
 
   return (
@@ -28,10 +36,13 @@ const LoginForm = () => {
       role="form"
       className="mx-auto max-w-96 rounded-md bg-white p-6 shadow-md"
     >
-      <div className="flex items-center justify-center gap-3 py-4">
+      <div className="flex items-center justify-center gap-3 p-2">
         <img src="/logo.svg" alt="logo" className="h-8" />
         <h1 className="text-xl font-semibold">TaskMate</h1>
       </div>
+      <p className="mb-2 min-h-[20px] text-center text-sm text-red-500">
+        {errorMessage ?? ''}
+      </p>
       <FormField
         label="Email"
         name="email"

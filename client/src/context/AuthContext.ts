@@ -7,8 +7,12 @@ import { User } from '../types/user'
 export interface AuthContextType {
   isAuthenticated?: boolean
   user: User | null
-  login: (data: LoginFormData) => Promise<void>
-  register: (data: RegisterFormData) => Promise<void>
+  login: (
+    data: LoginFormData
+  ) => Promise<{ success: boolean; message?: string }>
+  register: (
+    data: RegisterFormData
+  ) => Promise<{ success: boolean; message?: string }>
   logout: () => Promise<void>
 }
 
