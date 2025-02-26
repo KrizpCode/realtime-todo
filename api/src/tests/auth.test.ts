@@ -78,7 +78,7 @@ describe('Authentication - Register', () => {
   it('should not allow duplicate email registration', async () => {
     const res = await registerUser(validUser)
     expect(res.status).toBe(400)
-    expect(res.body).toEqual({ message: 'Email already in use' })
+    expect(res.body).toEqual({ status: 400, message: 'Email already in use' })
   })
 })
 

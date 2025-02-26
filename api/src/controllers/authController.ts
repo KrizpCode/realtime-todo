@@ -2,66 +2,34 @@ import { NextFunction, Request, Response } from 'express'
 
 import { LoginDto, RegisterDto } from '../schemas/authSchemas'
 import { TypedRequest } from '../types/request'
-import {
-  createUser,
-  getUserByEmail,
-  getUserById,
-  loginUser
-} from '../services/userService'
-import {
-  generateAuthToken,
-  generateRefreshToken
-} from '../helpers/tokenHelpers'
-import { setAuthCookies } from '../helpers/setAuthCookies'
+import { getMe, loginUser, registerUser } from '../services/userService'
 
-const isProduction = process.env.NODE_ENV === 'production'
-const domain = isProduction ? '.taskmate.fun' : undefined
+import { clearAuthCookies, setAuthCookies } from '../helpers/authCookieHelpers'
+import { AuthenticationError } from '../errors/AuthenticationError'
 
 export const register = async (
   req: TypedRequest<RegisterDto>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
-  const { email: registerEmail, password, name: registerName } = req.body
+  try {
+    const { email, password, name } = req.body
 
-  const existingUser = await getUserByEmail(registerEmail)
+    const { user, authToken, refreshToken } = await registerUser(
+      email,
+      password,
+      name
+    )
 
-  if (existingUser) {
-    res.status(400).json({ message: 'Email already in use' })
-    return
+    setAuthCookies(res, authToken, refreshToken)
+
+    res.status(201).json({
+      message: 'Registration successful',
+      user: { id: user.id, email: user.email, name: user.name }
+    })
+  } catch (error) {
+    next(error)
   }
-
-  const newUser = await createUser(registerEmail, password, registerName)
-
-  if (!newUser) {
-    res.status(500).json({ message: 'Failed to register user' })
-    return
-  }
-
-  const { id: userId, email, name } = newUser
-
-  const authToken = generateAuthToken(userId)
-  const refreshToken = generateRefreshToken(userId)
-
-  res.cookie('authToken', authToken, {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: isProduction,
-    domain,
-    maxAge: 1000 * 60 * 15
-  })
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: isProduction,
-    domain,
-    maxAge: 1000 * 60 * 60 * 24 * 30
-  })
-
-  res.status(201).json({
-    message: 'User registered successfully',
-    user: { userId, email, name }
-  })
 }
 
 export const login = async (
@@ -78,49 +46,35 @@ export const login = async (
 
     res.status(200).json({
       message: 'Login successful',
-      user: { userId: user.id, email: user.email, name: user.name }
+      user: { id: user.id, email: user.email, name: user.name }
     })
   } catch (error) {
     next(error)
   }
 }
 
-export const logout = async (req: Request, res: Response) => {
-  res.clearCookie('authToken', {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: isProduction,
-    domain,
-    path: '/'
-  })
-
-  res.clearCookie('refreshToken', {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: isProduction,
-    domain,
-    path: '/'
-  })
+export const logout = async (_req: Request, res: Response) => {
+  clearAuthCookies(res)
 
   res.status(200).json({ message: 'Logged out successfully' })
 }
 
-export const getAuthenticatedUser = async (req: Request, res: Response) => {
-  const userId = req.userId
+export const getAuthenticatedUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req
 
-  if (!userId) {
-    res.status(401).json({ message: 'Unauthorized' })
-    return
+    if (typeof req.userId !== 'number') {
+      throw new AuthenticationError('Unauthorized')
+    }
+
+    const user = getMe(userId as number)
+
+    res.status(200).json({ user })
+  } catch (error) {
+    next(error)
   }
-
-  const user = await getUserById(userId)
-
-  if (!user) {
-    res.status(401).json({ message: 'User not found' })
-    return
-  }
-
-  res
-    .status(200)
-    .json({ user: { userId: user.id, email: user.email, name: user.name } })
 }

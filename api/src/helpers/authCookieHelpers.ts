@@ -24,3 +24,21 @@ export const setAuthCookies = (
     maxAge: 1000 * 60 * 60 * 24 * 30
   })
 }
+
+export const clearAuthCookies = (res: Response) => {
+  res.clearCookie('authToken', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: isProduction,
+    domain,
+    path: '/'
+  })
+
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: isProduction,
+    domain,
+    path: '/'
+  })
+}

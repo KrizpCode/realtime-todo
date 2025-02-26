@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs'
-import { User } from '@prisma/client'
 
 import { prisma } from '../db/client'
 import { AuthenticationError } from '../errors/AuthenticationError'
+import { ValidationError } from '../errors/ValidationError'
+import { ApiError } from '../errors/ApiError'
 import {
   generateAuthToken,
   generateRefreshToken
@@ -32,10 +33,30 @@ export const createUser = async (
   })
 }
 
-export const loginUser = async (
-  email: User['email'],
-  password: User['password']
+export const registerUser = async (
+  email: string,
+  password: string,
+  name: string
 ) => {
+  const existingUser = await getUserByEmail(email)
+
+  if (existingUser) {
+    throw new ValidationError('Email already in use')
+  }
+
+  const newUser = await createUser(email, password, name)
+
+  if (!newUser) {
+    throw new ApiError('Failed to register user')
+  }
+
+  const authToken = generateAuthToken(newUser.id)
+  const refreshToken = generateRefreshToken(newUser.id)
+
+  return { user: newUser, authToken, refreshToken }
+}
+
+export const loginUser = async (email: string, password: string) => {
   const user = await getUserByEmail(email)
   const passwordMatch = user && (await bcrypt.compare(password, user.password))
 
@@ -47,4 +68,14 @@ export const loginUser = async (
   const refreshToken = generateRefreshToken(user.id)
 
   return { user, authToken, refreshToken }
+}
+
+export const getMe = async (userId: number) => {
+  const user = await getUserById(userId)
+
+  if (!user) {
+    throw new AuthenticationError('User not found')
+  }
+
+  return { id: user.id, email: user.email, name: user.name }
 }
