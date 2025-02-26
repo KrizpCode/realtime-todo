@@ -1,12 +1,8 @@
-import { TodoItem, TodoList } from '@prisma/client'
-
 import { prisma } from '../db/client'
+import { NotFoundError } from '../errors/NotFoundError'
 
-export const createTodoitem = async (
-  listId: TodoList['id'],
-  text: TodoItem['text']
-) => {
-  return await prisma.todoItem.create({
+export const createTodoitem = async (listId: number, text: string) => {
+  const todoItem = await prisma.todoItem.create({
     data: {
       text,
       listId: listId
@@ -19,14 +15,20 @@ export const createTodoitem = async (
       }
     }
   })
+
+  if (!todoItem || !todoItem.list) {
+    throw new NotFoundError('Todo list not found')
+  }
+
+  return todoItem
 }
 
 export const updateTodoItem = async (
-  todoItemId: TodoItem['id'],
-  completed: TodoItem['completed'],
-  text: TodoItem['text']
+  todoItemId: number,
+  completed: boolean,
+  text: string
 ) => {
-  return await prisma.todoItem.update({
+  const updatedTodoItem = await prisma.todoItem.update({
     where: {
       id: todoItemId
     },
@@ -42,10 +44,16 @@ export const updateTodoItem = async (
       }
     }
   })
+
+  if (!updatedTodoItem || !updatedTodoItem.list) {
+    throw new NotFoundError('Todo list not found')
+  }
+
+  return updatedTodoItem
 }
 
-export const deleteTodoItem = async (todoItemId: TodoItem['id']) => {
-  return await prisma.todoItem.delete({
+export const deleteTodoItem = async (todoItemId: number) => {
+  const deletedTodoitem = await prisma.todoItem.delete({
     where: {
       id: todoItemId
     },
@@ -57,4 +65,10 @@ export const deleteTodoItem = async (todoItemId: TodoItem['id']) => {
       }
     }
   })
+
+  if (!deletedTodoitem || !deletedTodoitem.list) {
+    throw new NotFoundError('Todo list not found')
+  }
+
+  return deletedTodoitem
 }
