@@ -1,5 +1,6 @@
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { type QueryClient } from '@tanstack/react-query'
+import { Toaster } from 'react-hot-toast'
 
 import Header from '../components/Header'
 import { AuthContextType } from '../context/AuthContext'
@@ -16,7 +17,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     if (context.auth.isAuthenticated !== undefined) return
 
     try {
-      const user = await fetchUser()
+      const { user } = await fetchUser()
+
       context.auth.user = user
       context.auth.isAuthenticated = !!user
     } catch {
@@ -39,6 +41,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             initialIsOpen={false}
           /> */}
         </div>
+        <Toaster position="top-center" />
       </div>
     </AuthProvider>
   )

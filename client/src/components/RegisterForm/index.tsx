@@ -6,6 +6,7 @@ import { Link } from '@tanstack/react-router'
 import { RegisterFormData, RegisterUserSchema } from './schema'
 import FormField from '../FormField'
 import { useAuth } from '../../hooks/useAuth'
+import toast from 'react-hot-toast'
 
 const RegisterForm = () => {
   const auth = useAuth()
@@ -28,6 +29,8 @@ const RegisterForm = () => {
     if (!result.success) {
       setErrorMessage(result.message)
     }
+
+    toast.success('Registration successful! 🎉')
   }
 
   return (

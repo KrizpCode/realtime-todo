@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
+import toast from 'react-hot-toast'
 
 import { useAuth } from '../../hooks/useAuth'
 import FormField from '../FormField'
@@ -28,6 +29,8 @@ const LoginForm = () => {
     if (!result.success) {
       setErrorMessage(result.message)
     }
+
+    toast.success('Login successful! 🎉')
   }
 
   return (

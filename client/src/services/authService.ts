@@ -16,7 +16,5 @@ export const logoutUser = async () => {
 }
 
 export const fetchUser = async () => {
-  const response = await apiClient.get<{ user: User }>('/api/auth/me')
-
-  return response.user
+  return await apiClient.get<{ user: User }>('/api/auth/me')
 }

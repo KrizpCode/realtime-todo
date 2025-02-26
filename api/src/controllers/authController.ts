@@ -69,7 +69,7 @@ export const getAuthenticatedUser = async (
       throw new AuthenticationError('Unauthorized')
     }
 
-    const user = getMe(req.userId as number)
+    const user = await getMe(req.userId as number)
 
     res.status(200).json({ user })
   } catch (error) {

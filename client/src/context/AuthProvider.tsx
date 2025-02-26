@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearch } from '@tanstack/react-router'
+import toast from 'react-hot-toast'
 
 import { AuthContext } from './AuthContext'
 import {
@@ -92,17 +93,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await logoutUser()
       syncAuthState(null)
+
+      toast.success('Logged out successfully')
+
       await router.navigate({ to: '/login' })
-    } catch (error) {
-      console.error('Logout failed', error)
-      // TODO: Display error message to user
+    } catch {
+      toast.error('Logout failed. Please try again.')
     }
   }, [syncAuthState, router])
 
   const refreshUser = useCallback(async () => {
     try {
       const userData = await fetchUser()
-      syncAuthState(userData)
+      syncAuthState(userData.user)
     } catch {
       syncAuthState(null)
       await router.navigate({ to: '/login' })
