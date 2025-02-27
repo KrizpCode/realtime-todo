@@ -83,19 +83,17 @@ describe('Authentication - Register', () => {
 })
 
 describe('Authentication - Login', () => {
-  it('should return 200 and set authentication cookies', async () => {
+  it('should return 200, with authToken and set refreshToken cookie', async () => {
     const res = await loginUser(validUser)
     expect(res.status).toBe(200)
+
+    const authToken = res.body.token
+    expect(authToken).toBeDefined()
+    expect(res.headers['authorization']).toBe(`Bearer ${authToken}`)
 
     const cookies = (res.headers['set-cookie'] as unknown as string[]) || []
     expect(cookies).toBeDefined()
     expect(Array.isArray(cookies)).toBe(true)
-
-    const authTokenCookie = cookies.find((cookie: string) =>
-      cookie.startsWith('authToken')
-    )
-    expect(authTokenCookie).toBeDefined()
-    expect(authTokenCookie).toContain('HttpOnly')
 
     const refreshTokenCookie = cookies.find((cookie: string) =>
       cookie.startsWith('refreshToken')
@@ -129,18 +127,17 @@ describe('Authentication - Login', () => {
 })
 
 describe('Authentication - Logout', () => {
-  it('should clear auth cookies on logout', async () => {
+  it('should clear authHeaders and refreshToken cookie on logout', async () => {
     const loginRes = await loginUser(validUser)
     expect(loginRes.status).toBe(200)
 
     const logoutRes = await request(app).post('/api/auth/logout')
     expect(logoutRes.status).toBe(200)
 
+    expect(logoutRes.headers['authorization']).toBe('')
+
     const cookies = logoutRes.headers['set-cookie'] as unknown as string[]
     expect(cookies).toBeDefined()
-    expect(
-      cookies.find((cookie: string) => cookie.startsWith('authToken=;'))
-    ).toBeDefined()
     expect(
       cookies.find((cookie: string) => cookie.startsWith('refreshToken=;'))
     ).toBeDefined()
@@ -164,11 +161,7 @@ describe('Authentication - Refresh Token', () => {
     expect(res.status).toBe(200)
     expect(res.body.user).toBeDefined()
 
-    const newCookies = res.headers['set-cookie'] as unknown as string[]
-    const newAuthToken = newCookies.find((cookie: string) =>
-      cookie.startsWith('authToken')
-    )
-
+    const newAuthToken = res.body.token
     expect(newAuthToken).toBeDefined()
   })
 

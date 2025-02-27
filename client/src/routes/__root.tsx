@@ -6,6 +6,7 @@ import Header from '../components/Header'
 import { AuthContextType } from '../context/AuthContext'
 import { fetchUser } from '../services/authService'
 import { AuthProvider } from '../context/AuthProvider'
+import { setAuthToken } from '../services/auhToken'
 
 interface RouterContext {
   auth: AuthContextType
@@ -17,7 +18,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     if (context.auth.isAuthenticated !== undefined) return
 
     try {
-      const { user } = await fetchUser()
+      const { user, token } = await fetchUser()
+
+      setAuthToken(token)
 
       context.auth.user = user
       context.auth.isAuthenticated = !!user

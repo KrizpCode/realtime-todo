@@ -13,6 +13,7 @@ import { User } from '../types/user'
 import { LoginFormData } from '../components/LoginForm/schema'
 import { RegisterFormData } from '../components/RegisterForm/schema'
 import { ApiError } from '../services/apiClient'
+import { setAuthToken } from '../services/auhToken'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -33,19 +34,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [auth.user, user])
 
   const syncAuthState = useCallback(
-    (user: User | null) => {
+    (user: User | null, token: string | null) => {
       setUser(user)
       auth.user = user
       auth.isAuthenticated = !!user
+
+      if (token) {
+        setAuthToken(token)
+      }
     },
+
     [auth]
   )
 
   const register = useCallback(
     async (data: RegisterFormData) => {
       try {
-        const userData = await registerUser(data)
-        syncAuthState(userData.user)
+        const response = await registerUser(data)
+        syncAuthState(response.user, response.token)
 
         await router.navigate({ to: '/dashboard' })
 
@@ -68,8 +74,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = useCallback(
     async (data: LoginFormData) => {
       try {
-        const userData = await loginUser(data)
-        syncAuthState(userData.user)
+        const response = await loginUser(data)
+        syncAuthState(response.user, response.token)
 
         await router.navigate({ to: search.redirect || '/dashboard' })
 
@@ -92,7 +98,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = useCallback(async () => {
     try {
       await logoutUser()
-      syncAuthState(null)
+      syncAuthState(null, null)
 
       toast.success('Logged out successfully')
 
@@ -104,10 +110,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const userData = await fetchUser()
-      syncAuthState(userData.user)
+      const response = await fetchUser()
+      syncAuthState(response.user, response.token)
     } catch {
-      syncAuthState(null)
+      syncAuthState(null, null)
+
       await router.navigate({ to: '/login' })
       // TODO: Display error message to user
     }

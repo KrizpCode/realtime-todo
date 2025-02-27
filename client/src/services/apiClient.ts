@@ -1,3 +1,5 @@
+import { getAuthToken } from './auhToken'
+
 export class ApiError extends Error {
   status: number
   message: string
@@ -24,9 +26,14 @@ const request = async <T>(
   body?: unknown
 ): Promise<T> => {
   try {
+    const authToken = getAuthToken()
+
     const response = await fetch(getUrl(urlPath), {
       method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
+      },
       credentials: 'include',
       body: body ? JSON.stringify(body) : undefined
     })

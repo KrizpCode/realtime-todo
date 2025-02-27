@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
 
 import { generateAuthToken, verifyToken } from '../helpers/tokenHelpers'
-import { setAuthCookies } from '../helpers/authCookieHelpers'
+import {
+  getBearerToken,
+  setAuthCookie,
+  setBearerToken
+} from '../helpers/authHelpers'
 import { AuthenticationError } from '../errors/AuthenticationError'
 
 export const authenticateUser = async (
@@ -9,7 +13,8 @@ export const authenticateUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { authToken, refreshToken } = req.cookies
+  const authToken = getBearerToken(req)
+  const { refreshToken } = req.cookies
 
   if (authToken) {
     try {
@@ -29,9 +34,11 @@ export const authenticateUser = async (
     const payload = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET!)
     const newAuthToken = generateAuthToken(payload.userId)
 
-    setAuthCookies(res, newAuthToken, refreshToken)
+    setAuthCookie(res, refreshToken)
+    setBearerToken(res, newAuthToken)
 
     req.userId = payload.userId
+
     return next()
   } catch {
     return next(new AuthenticationError('Invalid refresh token'))

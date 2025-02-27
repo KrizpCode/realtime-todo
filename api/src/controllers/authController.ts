@@ -4,8 +4,13 @@ import { LoginDto, RegisterDto } from '../schemas/authSchemas'
 import { TypedRequest } from '../types/request'
 import { getMe, loginUser, registerUser } from '../services/userService'
 
-import { clearAuthCookies, setAuthCookies } from '../helpers/authCookieHelpers'
+import {
+  clearAuthCookie,
+  setAuthCookie,
+  setBearerToken
+} from '../helpers/authHelpers'
 import { AuthenticationError } from '../errors/AuthenticationError'
+import { generateAuthToken } from '../helpers/tokenHelpers'
 
 export const register = async (
   req: TypedRequest<RegisterDto>,
@@ -21,11 +26,13 @@ export const register = async (
       name
     )
 
-    setAuthCookies(res, authToken, refreshToken)
+    setAuthCookie(res, refreshToken)
+    setBearerToken(res, authToken)
 
     res.status(201).json({
       message: 'Registration successful',
-      user: { id: user.id, email: user.email, name: user.name }
+      user: { id: user.id, email: user.email, name: user.name },
+      token: authToken
     })
   } catch (error) {
     next(error)
@@ -42,11 +49,13 @@ export const login = async (
 
     const { user, authToken, refreshToken } = await loginUser(email, password)
 
-    setAuthCookies(res, authToken, refreshToken)
+    setAuthCookie(res, refreshToken)
+    setBearerToken(res, authToken)
 
     res.status(200).json({
       message: 'Login successful',
-      user: { id: user.id, email: user.email, name: user.name }
+      user: { id: user.id, email: user.email, name: user.name },
+      token: authToken
     })
   } catch (error) {
     next(error)
@@ -54,8 +63,9 @@ export const login = async (
 }
 
 export const logout = async (_req: Request, res: Response) => {
-  clearAuthCookies(res)
+  clearAuthCookie(res)
 
+  res.setHeader('Authorization', '')
   res.status(200).json({ message: 'Logged out successfully' })
 }
 
@@ -71,7 +81,10 @@ export const getAuthenticatedUser = async (
 
     const user = await getMe(req.userId as number)
 
-    res.status(200).json({ user })
+    const newAuthToken = generateAuthToken(user.id)
+    setBearerToken(res, newAuthToken)
+
+    res.status(200).json({ user, token: newAuthToken })
   } catch (error) {
     next(error)
   }
