@@ -7,6 +7,11 @@ import {
   setBearerToken
 } from '../helpers/authHelpers'
 import { AuthenticationError } from '../errors/AuthenticationError'
+import {
+  createRefreshToken,
+  getRefreshToken,
+  invalidateRefreshToken
+} from '../services/refreshTokenService'
 
 export const authenticateUser = async (
   req: Request,
@@ -31,13 +36,25 @@ export const authenticateUser = async (
   }
 
   try {
-    const payload = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET!)
-    const newAuthToken = generateAuthToken(payload.userId)
+    const storedToken = await getRefreshToken(refreshToken)
 
-    setAuthCookie(res, refreshToken)
+    if (
+      !storedToken ||
+      !storedToken.isValid ||
+      storedToken.expiresAt < new Date()
+    ) {
+      return next(new AuthenticationError('Invalid refresh token'))
+    }
+
+    await invalidateRefreshToken(refreshToken)
+
+    const newAuthToken = generateAuthToken(storedToken.userId)
+    const newRefreshTokenRecord = await createRefreshToken(storedToken.userId)
+
+    setAuthCookie(res, newRefreshTokenRecord.token)
     setBearerToken(res, newAuthToken)
 
-    req.userId = payload.userId
+    req.userId = storedToken.userId
 
     return next()
   } catch {

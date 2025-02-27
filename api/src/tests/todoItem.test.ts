@@ -22,11 +22,11 @@ import request from 'supertest'
 import app from '../app'
 import { prisma } from '../db/client'
 import { createUser } from '../services/userService'
-import { createTodoList } from '../services/todoListService'
+import { createTodoList as createTodoListService } from '../services/todoListService'
 import { createTodoitem as createTodoItemService } from '../services/todoItemService'
 
 const validUser = {
-  email: `testingTodoItems@test.com`,
+  email: 'testingTodoItem@test.com',
   password: 'password123',
   name: 'Test User'
 }
@@ -35,36 +35,54 @@ const loginUser = async (user: Partial<typeof validUser>) => {
   return request(app).post('/api/auth/login').send(user)
 }
 
-const createTodoItem = async (
-  cookies: string[],
-  listId: number,
-  text: string
-) => {
-  return request(app)
-    .post('/api/todo-items')
-    .set('Cookie', cookies)
+let authState: {
+  cookies: string[]
+  token: string
+}
+
+const updateAuthState = (res: request.Response) => {
+  const cookies = res.headers['set-cookie'] as unknown as string[]
+  const token = res.body.token || res.headers.authorization?.split(' ')[1]
+
+  if (cookies) authState.cookies = cookies
+  if (token) authState.token = token
+}
+
+const createTodoItem = async (listId: number, text: string) => {
+  const res = await request(app)
+    .post(`/api/todo-items`)
+    .set('Cookie', authState.cookies)
+    .set('Authorization', `Bearer ${authState.token}`)
     .send({ text, listId })
+
+  updateAuthState(res)
+  return res
 }
 
 const updateTodoItem = async (
-  cookies: string[],
-  todoItemId: number,
-  completed: boolean,
-  text: string
+  itemId: number,
+  updates: { text?: string; completed?: boolean; listId: number }
 ) => {
-  return request(app)
-    .put(`/api/todo-items/${todoItemId}`)
-    .set('Cookie', cookies)
-    .send({ completed, text })
+  const res = await request(app)
+    .put(`/api/todo-items/${itemId}`)
+    .set('Cookie', authState.cookies)
+    .set('Authorization', `Bearer ${authState.token}`)
+    .send(updates)
+
+  updateAuthState(res)
+  return res
 }
 
-const deleteTodoItem = async (cookies: string[], todoItemId: number) => {
-  return request(app)
-    .delete(`/api/todo-items/${todoItemId}`)
-    .set('Cookie', cookies)
+const deleteTodoItem = async (itemId: number) => {
+  const res = await request(app)
+    .delete(`/api/todo-items/${itemId}`)
+    .set('Cookie', authState.cookies)
+    .set('Authorization', `Bearer ${authState.token}`)
+
+  updateAuthState(res)
+  return res
 }
 
-let authCookies: string[]
 let testUserId: number | null = null
 let testTodoListId: number | null = null
 let testTodoItemId: number | null = null
@@ -75,19 +93,16 @@ beforeAll(async () => {
     validUser.password,
     validUser.name
   )
-
   testUserId = user.id
 
   const loginRes = await loginUser(validUser)
 
-  authCookies =
-    loginRes.headers['set-cookie'] &&
-    Array.isArray(loginRes.headers['set-cookie'])
-      ? loginRes.headers['set-cookie']
-      : []
+  authState = {
+    cookies: loginRes.headers['set-cookie'] as unknown as string[],
+    token: loginRes.body.token
+  }
 
-  const todoList = await createTodoList(testUserId!, 'Test Todo List')
-
+  const todoList = await createTodoListService(testUserId!, 'Test Todo List')
   testTodoListId = todoList.id
 })
 
@@ -112,11 +127,7 @@ afterAll(async () => {
 
 describe('Todo Items - CRUD', () => {
   it('should create a new todo item', async () => {
-    const res = await createTodoItem(
-      authCookies,
-      testTodoListId!,
-      'My First Todo Item'
-    )
+    const res = await createTodoItem(testTodoListId!, 'My First Todo Item')
 
     expect(res.status).toBe(201)
     expect(res.body.message).toBe('Todo item created successfully')
@@ -135,12 +146,11 @@ describe('Todo Items - CRUD', () => {
     )
     testTodoItemId = createdItem.id
 
-    const res = await updateTodoItem(
-      authCookies,
-      testTodoItemId!,
-      true,
-      'Updated Todo Item'
-    )
+    const res = await updateTodoItem(testTodoItemId!, {
+      completed: true,
+      text: 'Updated Todo Item',
+      listId: testTodoListId!
+    })
 
     expect(res.status).toBe(200)
     expect(res.body.message).toBe('Todo item updated successfully')
@@ -160,7 +170,7 @@ describe('Todo Items - CRUD', () => {
     )
     testTodoItemId = createdItem.id
 
-    const res = await deleteTodoItem(authCookies, testTodoItemId!)
+    const res = await deleteTodoItem(testTodoItemId!)
 
     expect(res.status).toBe(200)
     expect(res.body.message).toBe('Todo item deleted successfully')
@@ -172,14 +182,18 @@ describe('Todo Items - CRUD', () => {
   })
 
   it('should return 404 for updating a non-existent todo item', async () => {
-    const res = await updateTodoItem(authCookies, 999999, true, 'Non-existent')
+    const res = await updateTodoItem(999999, {
+      completed: true,
+      text: 'Non-existent',
+      listId: testTodoListId!
+    })
 
     expect(res.status).toBe(404)
     expect(res.body.message).toBe('Todo item not found')
   })
 
   it('should return 404 for deleting a non-existent todo item', async () => {
-    const res = await deleteTodoItem(authCookies, 999999)
+    const res = await deleteTodoItem(999999)
 
     expect(res.status).toBe(404)
     expect(res.body.message).toBe('Todo item not found')

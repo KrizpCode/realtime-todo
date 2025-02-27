@@ -8,11 +8,12 @@ generator client {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  name      String
-  password  String
-  todoLists TodoList[]
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String
+  password      String
+  todoLists     TodoList[]
+  refreshTokens RefreshToken[]
 }
 
 model TodoList {
@@ -34,4 +35,14 @@ model TodoItem {
   list      TodoList @relation(fields: [listId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isValid   Boolean  @default(true)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

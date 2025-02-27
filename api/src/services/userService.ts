@@ -4,11 +4,9 @@ import { prisma } from '../db/client'
 import { AuthenticationError } from '../errors/AuthenticationError'
 import { ValidationError } from '../errors/ValidationError'
 import { ApiError } from '../errors/ApiError'
-import {
-  generateAuthToken,
-  generateRefreshToken
-} from '../helpers/tokenHelpers'
+import { generateAuthToken } from '../helpers/tokenHelpers'
 import { NotFoundError } from '../errors/NotFoundError'
+import { createRefreshToken } from '../services/refreshTokenService'
 
 export const getUserByEmail = async (email: string) => {
   return prisma.user.findUnique({ where: { email } })
@@ -52,9 +50,9 @@ export const registerUser = async (
   }
 
   const authToken = generateAuthToken(newUser.id)
-  const refreshToken = generateRefreshToken(newUser.id)
+  const refreshToken = await createRefreshToken(newUser.id)
 
-  return { user: newUser, authToken, refreshToken }
+  return { user: newUser, authToken, refreshToken: refreshToken.token }
 }
 
 export const loginUser = async (email: string, password: string) => {
@@ -66,9 +64,13 @@ export const loginUser = async (email: string, password: string) => {
   }
 
   const authToken = generateAuthToken(user.id)
-  const refreshToken = generateRefreshToken(user.id)
+  const refreshToken = await createRefreshToken(user.id)
 
-  return { user, authToken, refreshToken }
+  return {
+    user,
+    authToken,
+    refreshToken: refreshToken.token
+  }
 }
 
 export const getMe = async (userId: number) => {

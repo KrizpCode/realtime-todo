@@ -11,6 +11,10 @@ import request from 'supertest'
 import { prisma } from '../db/client'
 import app from '../app'
 import { createUser, getUserByEmail } from '../services/userService'
+import {
+  deleteExpiredTokens,
+  getRefreshToken
+} from '../services/refreshTokenService'
 
 const generateUniqueEmail = () => `test+${Date.now()}@test.com`
 
@@ -145,41 +149,115 @@ describe('Authentication - Logout', () => {
 })
 
 describe('Authentication - Refresh Token', () => {
-  it('should refresh the authToken if refreshToken is valid', async () => {
+  it('should create and store refresh token on login', async () => {
     const loginRes = await loginUser(validUser)
     expect(loginRes.status).toBe(200)
 
     const cookies = loginRes.headers['set-cookie'] as unknown as string[]
-    const refreshOnlyCookies = cookies.filter((cookie) =>
-      cookie.startsWith('refreshToken')
+    const refreshTokenCookie = cookies.find((cookie) =>
+      cookie.startsWith('refreshToken=')
+    )
+    const token = refreshTokenCookie?.split(';')[0].split('=')[1]
+
+    const storedToken = await getRefreshToken(token!)
+    expect(storedToken).toBeDefined()
+    expect(storedToken?.isValid).toBe(true)
+    expect(storedToken?.userId).toBe(testUserId)
+  })
+
+  it('should rotate refresh token when used', async () => {
+    const loginRes = await loginUser(validUser)
+    const cookies = loginRes.headers['set-cookie'] as unknown as string[]
+    const initialRefreshToken = cookies.find((cookie) =>
+      cookie.startsWith('refreshToken=')
     )
 
-    const res = await request(app)
+    const protectedRes = await request(app)
       .get('/api/auth/me')
-      .set('Cookie', refreshOnlyCookies)
+      .set('Cookie', [initialRefreshToken!])
 
-    expect(res.status).toBe(200)
-    expect(res.body.user).toBeDefined()
+    expect(protectedRes.status).toBe(200)
 
-    const newAuthToken = res.body.token
-    expect(newAuthToken).toBeDefined()
+    const oldToken = initialRefreshToken!.split(';')[0].split('=')[1]
+    const invalidatedToken = await getRefreshToken(oldToken)
+    expect(invalidatedToken?.isValid).toBe(false)
+
+    const newCookies = protectedRes.headers['set-cookie'] as unknown as string[]
+    const newRefreshToken = newCookies.find((cookie) =>
+      cookie.startsWith('refreshToken=')
+    )
+    expect(newRefreshToken).toBeDefined()
+    expect(newRefreshToken).not.toBe(initialRefreshToken)
+
+    const newToken = newRefreshToken!.split(';')[0].split('=')[1]
+    const newStoredToken = await getRefreshToken(newToken)
+    expect(newStoredToken?.isValid).toBe(true)
   })
 
-  it('should return 401 if both authToken and refreshToken are missing', async () => {
-    const res = await request(app).get('/api/auth/me')
+  it('should not allow reuse of rotated tokens', async () => {
+    const loginRes = await loginUser(validUser)
+    const cookies = loginRes.headers['set-cookie'] as unknown as string[]
+    const initialRefreshToken = cookies.find((cookie) =>
+      cookie.startsWith('refreshToken=')
+    )
 
-    expect(res.status).toBe(401)
-    expect(res.body.message).toBe('Unauthorized')
+    const firstUseRes = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', [initialRefreshToken!])
+    expect(firstUseRes.status).toBe(200)
+
+    const secondUseRes = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', [initialRefreshToken!])
+    expect(secondUseRes.status).toBe(401)
+    expect(secondUseRes.body.message).toBe('Invalid refresh token')
   })
 
-  it('should return 401 if refreshToken is invalid', async () => {
-    const invalidCookies = ['refreshToken=invalid']
+  it('should not accept expired refresh tokens', async () => {
+    const expiredToken = await prisma.refreshToken.create({
+      data: {
+        token: 'expired_token',
+        userId: testUserId!,
+        expiresAt: new Date(Date.now() - 1000), // Set to past
+        isValid: true
+      }
+    })
 
     const res = await request(app)
       .get('/api/auth/me')
-      .set('Cookie', invalidCookies)
+      .set('Cookie', [`refreshToken=${expiredToken.token}`])
 
     expect(res.status).toBe(401)
     expect(res.body.message).toBe('Invalid refresh token')
+  })
+
+  it('should cleanup expired tokens', async () => {
+    await prisma.refreshToken.createMany({
+      data: [
+        {
+          token: 'expired1',
+          userId: testUserId!,
+          expiresAt: new Date(Date.now() - 1000),
+          isValid: true
+        },
+        {
+          token: 'expired2',
+          userId: testUserId!,
+          expiresAt: new Date(Date.now() - 1000),
+          isValid: false
+        }
+      ]
+    })
+
+    await deleteExpiredTokens()
+
+    const remainingTokens = await prisma.refreshToken.findMany({
+      where: {
+        token: {
+          in: ['expired1', 'expired2']
+        }
+      }
+    })
+    expect(remainingTokens).toHaveLength(0)
   })
 })
