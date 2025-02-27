@@ -1,5 +1,11 @@
 # Realtime Todo
 
+## Hosted Application
+
+- [https://app.taskmate.fun](https://app.taskmate.fun)
+
+Frontend hosted on [Vercel](https://vercel.com/), backend hosted on [Railway](https://railway.com/).
+
 ## User Stories
 
 - [x] ️I as a user can create to-do items, such as a grocery list.
